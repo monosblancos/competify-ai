@@ -22,16 +22,16 @@ const HomePage: React.FC = () => {
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in">
                 <Link
-                  to="/register"
+                  to="/analisis-cv"
                   className="btn-hero"
                 >
-                  Comenzar Gratis
+                  Analizar mi CV Gratis
                 </Link>
                 <Link
-                  to="/login"
+                  to="/register"
                   className="btn-secondary bg-white/10 text-white border-white/20 hover:bg-white/20"
                 >
-                  Iniciar Sesión
+                  Crear Cuenta
                 </Link>
               </div>
             </div>
@@ -104,12 +104,20 @@ const HomePage: React.FC = () => {
           <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
             Únete a miles de profesionales que han potenciado su carrera con nuestras certificaciones personalizadas.
           </p>
-          <Link
-            to="/register"
-            className="btn-hero bg-white text-primary hover:bg-white/90 hover:shadow-glow"
-          >
-            Crear Cuenta Gratuita
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              to="/analisis-cv"
+              className="btn-hero bg-white text-primary hover:bg-white/90 hover:shadow-glow"
+            >
+              Analizar CV Gratis
+            </Link>
+            <Link
+              to="/register"
+              className="btn-secondary bg-white/10 text-white border-white/20 hover:bg-white/20"
+            >
+              Crear Cuenta
+            </Link>
+          </div>
         </div>
       </section>
 
