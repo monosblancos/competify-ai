@@ -1,127 +1,219 @@
-import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
-import { User, AuthContextType, CVAnalysisResult, UserProgress } from '../types';
-import { standardsData } from '../data/standardsData';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { User as SupabaseUser, Session } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
+import type { AuthContextType, CVAnalysisResult, UserProgress } from '../types';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [user, setUser] = useState<SupabaseUser | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [lastAnalysis, setLastAnalysis] = useState<CVAnalysisResult | null>(null);
   const [progress, setProgress] = useState<UserProgress>({});
+  const [userProfile, setUserProfile] = useState<any>(null);
 
   useEffect(() => {
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          // Fetch user profile when user is authenticated
+          setTimeout(() => {
+            fetchUserProfile(session.user.id);
+          }, 0);
+        } else {
+          setUserProfile(null);
+          setLastAnalysis(null);
+          setProgress({});
+        }
+      }
+    );
+
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchUserProfile(session.user.id);
+      }
+      setIsLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const fetchUserProfile = async (userId: string) => {
     try {
-      const storedUser = localStorage.getItem('certifica-user');
-      if (storedUser) {
-        const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
-        const storedProgress = localStorage.getItem(`certifica-progress-${parsedUser.email}`);
-        if (storedProgress) {
-          setProgress(JSON.parse(storedProgress));
-        }
-        const storedAnalysis = localStorage.getItem(`certifica-analysis-${parsedUser.email}`);
-        if(storedAnalysis) {
-          setLastAnalysis(JSON.parse(storedAnalysis));
-        }
+      const { data: profile, error } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('id', userId)
+        .maybeSingle();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching user profile:', error);
+        return;
+      }
+
+      if (profile) {
+        setUserProfile(profile);
+        setLastAnalysis(profile.last_analysis_result as unknown as CVAnalysisResult | null);
+        setProgress((profile.progress as unknown as UserProgress) || {});
       }
     } catch (error) {
-      console.error('Failed to parse data from localStorage', error);
-    } finally {
-      setIsLoading(false);
+      console.error('Error fetching user profile:', error);
     }
-  }, []);
-  
-  const handleSetAnalysis = (analysis: CVAnalysisResult | null) => {
-    setLastAnalysis(analysis);
-    if(user && analysis) {
-        localStorage.setItem(`certifica-analysis-${user.email}`, JSON.stringify(analysis));
-    } else if (user && !analysis) {
-        localStorage.removeItem(`certifica-analysis-${user.email}`);
-    }
-  }
-  
-  const updateProgress = (newProgress: UserProgress) => {
-      setProgress(newProgress);
-      if (user) {
-          localStorage.setItem(`certifica-progress-${user.email}`, JSON.stringify(newProgress));
+  };
+
+  const login = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    return { error };
+  };
+
+  const logout = async () => {
+    await supabase.auth.signOut();
+  };
+
+  const register = async (email: string, password: string, metadata?: { name?: string }) => {
+    const redirectUrl = `${window.location.origin}/`;
+    
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: redirectUrl,
+        data: metadata
       }
-  }
-
-  const login = (name: string, email: string) => {
-    const userData = { name, email };
-    localStorage.setItem('certifica-user', JSON.stringify(userData));
-    setUser(userData);
-    const storedProgress = localStorage.getItem(`certifica-progress-${email}`);
-    setProgress(storedProgress ? JSON.parse(storedProgress) : {});
-    const storedAnalysis = localStorage.getItem(`certifica-analysis-${email}`);
-    setLastAnalysis(storedAnalysis ? JSON.parse(storedAnalysis) : null);
+    });
+    return { error };
   };
 
-  const logout = () => {
-    localStorage.removeItem('certifica-user');
-    setUser(null);
-    setLastAnalysis(null);
-    setProgress({});
+  const updateProgress = async (newProgress: UserProgress) => {
+    if (!user) return;
+    
+    try {
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({ progress: newProgress })
+        .eq('id', user.id);
+
+      if (error) {
+        console.error('Error updating progress:', error);
+        return;
+      }
+
+      setProgress(newProgress);
+    } catch (error) {
+      console.error('Error updating progress:', error);
+    }
   };
 
-  const register = (name: string, email: string) => {
-    const userData = { name, email };
-    localStorage.setItem('certifica-user', JSON.stringify(userData));
-    setUser(userData);
-    setLastAnalysis(null);
-    setProgress({});
+  const updateLastAnalysis = async (analysis: CVAnalysisResult) => {
+    if (!user) return;
+    
+    try {
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({ last_analysis_result: analysis as any })
+        .eq('id', user.id);
+
+      if (error) {
+        console.error('Error updating analysis:', error);
+        return;
+      }
+
+      setLastAnalysis(analysis);
+    } catch (error) {
+      console.error('Error updating analysis:', error);
+    }
   };
-  
+
   const startCertification = (standardCode: string) => {
-      const newProgress = { ...progress, [standardCode]: { completedModules: [] } };
-      updateProgress(newProgress);
-  }
-  
+    const newProgress = {
+      ...progress,
+      [standardCode]: { completedModules: [] }
+    };
+    updateProgress(newProgress);
+  };
+
   const toggleModuleCompletion = (standardCode: string, moduleId: string) => {
-      const standardProgress = progress[standardCode];
-      if(!standardProgress) return;
-      
-      const completed = standardProgress.completedModules;
-      const newCompleted = completed.includes(moduleId) 
-          ? completed.filter(id => id !== moduleId)
-          : [...completed, moduleId];
-      
-      const newProgress = { ...progress, [standardCode]: { completedModules: newCompleted } };
-      updateProgress(newProgress);
-  }
+    if (!progress[standardCode]) {
+      startCertification(standardCode);
+      return;
+    }
 
-  const isEnrolled = (standardCode: string) => {
-      return progress.hasOwnProperty(standardCode);
-  }
+    const currentModules = progress[standardCode].completedModules;
+    const updatedModules = currentModules.includes(moduleId)
+      ? currentModules.filter(id => id !== moduleId)
+      : [...currentModules, moduleId];
 
-  const getModuleStatus = (standardCode: string, moduleId: string, moduleIndex: number) => {
-    if (!isEnrolled(standardCode)) return 'locked';
-    if (progress[standardCode].completedModules.includes(moduleId)) return 'completed';
+    const newProgress = {
+      ...progress,
+      [standardCode]: { completedModules: updatedModules }
+    };
+    updateProgress(newProgress);
+  };
 
-    if (moduleIndex === 0) return 'unlocked';
+  const isEnrolled = (standardCode: string): boolean => {
+    return Boolean(progress[standardCode]);
+  };
+
+  const getModuleStatus = (standardCode: string, moduleId: string, moduleIndex: number): 'completed' | 'unlocked' | 'locked' => {
+    if (!progress[standardCode]) return 'locked';
     
-    const standard = standardsData.find(s => s.code === standardCode);
-    if(!standard) return 'locked';
-
-    const previousModuleId = standard.modules[moduleIndex - 1].id;
-    if (progress[standardCode].completedModules.includes(previousModuleId)) return 'unlocked';
-
+    const completedModules = progress[standardCode].completedModules;
+    
+    if (completedModules.includes(moduleId)) {
+      return 'completed';
+    }
+    
+    if (moduleIndex === 0 || completedModules.length >= moduleIndex) {
+      return 'unlocked';
+    }
+    
     return 'locked';
-  }
+  };
 
-  const getCertificationProgress = (standardCode: string) => {
-    if (!isEnrolled(standardCode)) return 0;
+  const getCertificationProgress = (standardCode: string): number => {
+    if (!progress[standardCode]) return 0;
     
-    const standard = standardsData.find(s => s.code === standardCode);
-    if (!standard || standard.modules.length === 0) return 0;
-    
+    // This is a simplified calculation - in real implementation, 
+    // you would get the total modules from the standards data
     const completedCount = progress[standardCode].completedModules.length;
-    return Math.round((completedCount / standard.modules.length) * 100);
-  }
+    const totalModules = 3; // Hardcoded for demo, should be dynamic
+    
+    return (completedCount / totalModules) * 100;
+  };
 
-
-  const value = { user, isLoading, login, logout, register, lastAnalysis, setLastAnalysis: handleSetAnalysis, progress, startCertification, toggleModuleCompletion, isEnrolled, getModuleStatus, getCertificationProgress };
+  const value: AuthContextType = {
+    user: user ? { 
+      name: user.user_metadata?.name || user.email?.split('@')[0] || 'Usuario', 
+      email: user.email || ''
+    } : null,
+    isLoading,
+    login,
+    logout,
+    register,
+    lastAnalysis,
+    setLastAnalysis: updateLastAnalysis,
+    progress,
+    startCertification,
+    toggleModuleCompletion,
+    isEnrolled,
+    getModuleStatus,
+    getCertificationProgress
+  };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

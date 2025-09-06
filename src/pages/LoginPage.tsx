@@ -4,8 +4,8 @@ import { useAuth } from '../contexts/AuthContext';
 
 const LoginPage: React.FC = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: ''
+    email: '',
+    password: ''
   });
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
@@ -15,15 +15,14 @@ const LoginPage: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
     
-    try {
-      // Simulate loading
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      login(formData.name, formData.email);
-      navigate('/dashboard');
-    } catch (error) {
-      console.error('Login failed:', error);
-    } finally {
+    const { error } = await login(formData.email, formData.password);
+    
+    if (error) {
+      console.error('Login error:', error);
+      alert(`Error de login: ${error.message}`);
       setIsLoading(false);
+    } else {
+      navigate('/dashboard');
     }
   };
 
@@ -52,38 +51,38 @@ const LoginPage: React.FC = () => {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
-                Nombre completo
-              </label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                required
-                value={formData.name}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground 
-                         placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary 
-                         focus:border-transparent transition-all"
-                placeholder="Tu nombre completo"
-              />
-            </div>
-
-            <div>
               <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
                 Correo electrónico
               </label>
               <input
+                type="email"
                 id="email"
                 name="email"
-                type="email"
-                required
                 value={formData.email}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground 
                          placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary 
                          focus:border-transparent transition-all"
                 placeholder="tu@email.com"
+                required
+              />
+            </div>
+            
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
+                Contraseña
+              </label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground 
+                         placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary 
+                         focus:border-transparent transition-all"
+                placeholder="••••••••"
+                required
               />
             </div>
 

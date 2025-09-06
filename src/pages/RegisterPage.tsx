@@ -5,7 +5,8 @@ import { useAuth } from '../contexts/AuthContext';
 const RegisterPage: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
-    email: ''
+    email: '',
+    password: ''
   });
   const [isLoading, setIsLoading] = useState(false);
   const { register } = useAuth();
@@ -15,15 +16,15 @@ const RegisterPage: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
     
-    try {
-      // Simulate loading
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      register(formData.name, formData.email);
-      navigate('/dashboard');
-    } catch (error) {
-      console.error('Registration failed:', error);
-    } finally {
+    const { error } = await register(formData.email, formData.password, { name: formData.name });
+    
+    if (error) {
+      console.error('Registration error:', error);
+      alert(`Error de registro: ${error.message}`);
       setIsLoading(false);
+    } else {
+      alert('Registro exitoso. Por favor revisa tu correo para confirmar tu cuenta.');
+      navigate('/login');
     }
   };
 
@@ -87,13 +88,32 @@ const RegisterPage: React.FC = () => {
               />
             </div>
 
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
+                Contraseña (mínimo 6 caracteres)
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                required
+                minLength={6}
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground 
+                         placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary 
+                         focus:border-transparent transition-all"
+                placeholder="••••••••"
+              />
+            </div>
+
             <div className="bg-accent/10 p-4 rounded-lg">
               <div className="flex items-center">
                 <svg className="w-5 h-5 text-accent-foreground mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <p className="text-sm text-accent-foreground">
-                  <strong>Demo:</strong> Puedes usar cualquier nombre y email para crear tu cuenta.
+                  Usa tu email real y una contraseña de al menos 6 caracteres.
                 </p>
               </div>
             </div>

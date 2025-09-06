@@ -61,11 +61,11 @@ export interface JobOpening {
 export interface AuthContextType {
   user: User | null;
   isLoading: boolean;
-  login: (name: string, email: string) => void;
-  logout: () => void;
-  register: (name: string, email: string) => void;
+  login: (email: string, password: string) => Promise<{ error: any }>;
+  logout: () => Promise<void>;
+  register: (email: string, password: string, metadata?: { name?: string }) => Promise<{ error: any }>;
   lastAnalysis: CVAnalysisResult | null;
-  setLastAnalysis: (analysis: CVAnalysisResult | null) => void;
+  setLastAnalysis: (analysis: CVAnalysisResult) => Promise<void>;
   progress: UserProgress;
   startCertification: (standardCode: string) => void;
   toggleModuleCompletion: (standardCode: string, moduleId: string) => void;
