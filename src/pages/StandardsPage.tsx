@@ -1,14 +1,49 @@
-import React, { useState } from 'react';
-import { standardsData } from '../data/standardsData';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import StandardCard from '../componets/StandardCard';
+import { Search, Filter, Book, Award } from 'lucide-react';
+
+interface Standard {
+  code: string;
+  title: string;
+  description: string;
+  category: string;
+  modules: any[];
+  is_core_offering: boolean;
+}
 
 const StandardsPage: React.FC = () => {
+  const [standards, setStandards] = useState<Standard[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
 
-  const categories = ['all', ...Array.from(new Set(standardsData.map(s => s.category)))];
+  useEffect(() => {
+    const fetchStandards = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('standards')
+          .select('*')
+          .order('code');
+
+        if (error) throw error;
+        setStandards((data || []).map(s => ({
+          ...s,
+          modules: s.modules as any[] || []
+        })));
+      } catch (error) {
+        console.error('Error fetching standards:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStandards();
+  }, []);
+
+  const categories = ['all', ...Array.from(new Set(standards.map(s => s.category)))];
   
-  const filteredStandards = standardsData.filter(standard => {
+  const filteredStandards = standards.filter(standard => {
     const matchesCategory = selectedCategory === 'all' || standard.category === selectedCategory;
     const matchesSearch = standard.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          standard.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -20,12 +55,31 @@ const StandardsPage: React.FC = () => {
     return category === 'all' ? 'Todas las categorías' : category;
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background py-8">
+        <div className="container mx-auto px-4">
+          <div className="animate-pulse">
+            <div className="h-10 bg-muted rounded w-1/2 mx-auto mb-4"></div>
+            <div className="h-6 bg-muted rounded w-2/3 mx-auto mb-8"></div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1, 2, 3, 4, 5, 6].map(i => (
+                <div key={i} className="h-64 bg-muted rounded-lg"></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background py-8">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-foreground mb-4">
+          <h1 className="text-4xl font-bold text-foreground mb-4 flex items-center justify-center">
+            <Book className="w-10 h-10 mr-3 text-primary" />
             Estándares de Competencia
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
@@ -44,9 +98,7 @@ const StandardsPage: React.FC = () => {
                   Buscar estándares
                 </label>
                 <div className="relative">
-                  <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <input
                     id="search"
                     type="text"
@@ -65,19 +117,22 @@ const StandardsPage: React.FC = () => {
                 <label htmlFor="category" className="block text-sm font-medium text-foreground mb-2">
                   Categoría
                 </label>
-                <select
-                  id="category"
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground 
-                           focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                >
-                  {categories.map(category => (
-                    <option key={category} value={category}>
-                      {getCategoryLabel(category)}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <select
+                    id="category"
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 border border-border rounded-lg bg-background text-foreground 
+                             focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  >
+                    {categories.map(category => (
+                      <option key={category} value={category}>
+                        {getCategoryLabel(category)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
           </div>
@@ -86,7 +141,7 @@ const StandardsPage: React.FC = () => {
         {/* Results Summary */}
         <div className="flex items-center justify-between mb-6">
           <p className="text-muted-foreground">
-            Mostrando {filteredStandards.length} de {standardsData.length} estándares
+            Mostrando {filteredStandards.length} de {standards.length} estándares
             {selectedCategory !== 'all' && ` en "${selectedCategory}"`}
             {searchTerm && ` que coinciden con "${searchTerm}"`}
           </p>
@@ -105,7 +160,13 @@ const StandardsPage: React.FC = () => {
         {filteredStandards.length > 0 ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredStandards.map(standard => (
-              <StandardCard key={standard.code} standard={standard} />
+              <StandardCard 
+                key={standard.code} 
+                standard={{
+                  ...standard,
+                  isCoreOffering: standard.is_core_offering
+                }} 
+              />
             ))}
           </div>
         ) : (
@@ -137,9 +198,7 @@ const StandardsPage: React.FC = () => {
         <div className="mt-12 card-elegant p-6">
           <div className="flex items-start">
             <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
-              <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-              </svg>
+              <Award className="w-6 h-6 text-primary" />
             </div>
             <div>
               <h3 className="font-semibold text-foreground mb-2">¿Por qué certificarse?</h3>
