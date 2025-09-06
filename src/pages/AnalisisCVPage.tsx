@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { CVAnalysisResult } from '../types';
 import StandardCard from '../componets/StandardCard';
 import { standardsData } from '../data/standardsData';
-import { useNavigate } from 'react-router-dom';
 
 const AnalisisCVPage: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -100,9 +100,21 @@ const AnalisisCVPage: React.FC = () => {
           <h1 className="text-4xl font-bold text-foreground mb-4">
             Análisis Inteligente de CV
           </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-6">
             Sube tu CV (PDF o imagen) para recibir un análisis y recomendaciones personalizadas con IA.
           </p>
+          
+          <div className="flex justify-center">
+            <Link 
+              to="/analisis-cv-texto" 
+              className="btn-secondary flex items-center"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              ¿Prefieres pegar el texto? Haz clic aquí
+            </Link>
+          </div>
         </header>
 
         <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">

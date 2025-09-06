@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import ModuleListItem from '../componets/ModuleListItem';
@@ -27,6 +27,7 @@ interface Standard {
 
 const StandardDetailPage: React.FC = () => {
   const { standardCode } = useParams<{ standardCode: string }>();
+  const navigate = useNavigate();
   const [standard, setStandard] = useState<Standard | null>(null);
   const [relatedStandards, setRelatedStandards] = useState<Standard[]>([]);
   const [loading, setLoading] = useState(true);
@@ -132,6 +133,10 @@ const StandardDetailPage: React.FC = () => {
 
   const handleEnroll = () => {
     startCertification(standard.code);
+    // Redirect to My Courses page after enrollment
+    setTimeout(() => {
+      navigate('/mis-cursos');
+    }, 100);
   };
 
   const getCategoryColor = (category: string) => {

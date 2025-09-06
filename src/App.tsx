@@ -9,6 +9,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import AnalisisCVPage from './pages/AnalisisCVPage';
+import CVTextAnalysisPage from './pages/CVTextAnalysisPage';
 import StandardsPage from './pages/StandardsPage';
 import StandardDetailPage from './pages/StandardDetailPage';
 import MyCoursesPage from './pages/MyCoursesPage';
@@ -31,6 +32,7 @@ const App: React.FC = () => {
             
             <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
             <Route path="/analisis-cv" element={<ProtectedRoute><AnalisisCVPage /></ProtectedRoute>} />
+            <Route path="/analisis-cv-texto" element={<ProtectedRoute><CVTextAnalysisPage /></ProtectedRoute>} />
             <Route path="/estandares" element={<ProtectedRoute><StandardsPage /></ProtectedRoute>} />
             <Route path="/estandares/:standardCode" element={<ProtectedRoute><StandardDetailPage /></ProtectedRoute>} />
             <Route path="/mis-cursos" element={<ProtectedRoute><MyCoursesPage /></ProtectedRoute>} />
