@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { GoogleGenAI, GenerateContentResponse } from '@google/genai';
 import { useAuth } from '../contexts/AuthContext';
 import { CVAnalysisResult } from '../types';
 import StandardCard from '../componets/StandardCard';
@@ -59,30 +58,26 @@ const AnalisisCVPage: React.FC = () => {
     setAnalysisResult(null);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
-      const imagePart = await fileToGenerativePart(file);
+      const fileData = await fileToGenerativePart(file);
+      const standards = standardsData.map(s => ({code: s.code, title: s.title}));
       
-      const prompt = `
-        Actúa como un experto en reclutamiento y en los estándares CONOCER. Analiza el siguiente CV.
-        1. Identifica 3-5 fortalezas clave (habilidades blandas o duras).
-        2. Identifica 2-3 áreas de oportunidad o habilidades que podrían mejorarse.
-        3. De la siguiente lista de estándares, recomienda el MÁS relevante para el perfil: ${JSON.stringify(standardsData.map(s => ({code: s.code, title: s.title})))}.
-        
-        Devuelve la respuesta ÚNICAMENTE en formato JSON con la siguiente estructura:
-        {
-          "strengths": ["Fortaleza 1", "Fortaleza 2"],
-          "opportunities": ["Oportunidad 1", "Oportunidad 2"],
-          "recommendedStandard": { "code": "ECXXXX", "title": "Título del estándar" }
-        }
-      `;
-
-      const result: GenerateContentResponse = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: { parts: [imagePart, { text: prompt }] },
+      const response = await fetch('/functions/v1/analyze-cv', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fileData: fileData.inlineData.data,
+          mimeType: fileData.inlineData.mimeType,
+          standards: standards
+        }),
       });
-      
-      const jsonString = result.text.replace(/```json|```/g, '').trim();
-      const parsedResult: CVAnalysisResult = JSON.parse(jsonString);
+
+      if (!response.ok) {
+        throw new Error('Error en el análisis');
+      }
+
+      const parsedResult: CVAnalysisResult = await response.json();
 
       setAnalysisResult(parsedResult);
       setLastAnalysis(parsedResult);
