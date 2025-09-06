@@ -14,27 +14,93 @@ export type Database = {
   }
   public: {
     Tables: {
-      standards: {
+      job_openings: {
         Row: {
-          Código: string
-          Comité: string | null
-          Nivel: number | null
-          "Sector Productivo": string | null
-          Título: string | null
+          company: string
+          created_at: string | null
+          description: string | null
+          id: string
+          location: string | null
+          required_standards: string[] | null
+          title: string
+          updated_at: string | null
         }
         Insert: {
-          Código: string
-          Comité?: string | null
-          Nivel?: number | null
-          "Sector Productivo"?: string | null
-          Título?: string | null
+          company: string
+          created_at?: string | null
+          description?: string | null
+          id: string
+          location?: string | null
+          required_standards?: string[] | null
+          title: string
+          updated_at?: string | null
         }
         Update: {
-          Código?: string
-          Comité?: string | null
-          Nivel?: number | null
-          "Sector Productivo"?: string | null
-          Título?: string | null
+          company?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          location?: string | null
+          required_standards?: string[] | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      standards: {
+        Row: {
+          category: string | null
+          code: string
+          created_at: string | null
+          description: string | null
+          is_core_offering: boolean | null
+          modules: Json | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          code: string
+          created_at?: string | null
+          description?: string | null
+          is_core_offering?: boolean | null
+          modules?: Json | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          code?: string
+          created_at?: string | null
+          description?: string | null
+          is_core_offering?: boolean | null
+          modules?: Json | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      user_profiles: {
+        Row: {
+          created_at: string | null
+          id: string
+          last_analysis_result: Json | null
+          progress: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id: string
+          last_analysis_result?: Json | null
+          progress?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          last_analysis_result?: Json | null
+          progress?: Json | null
+          updated_at?: string | null
         }
         Relationships: []
       }
