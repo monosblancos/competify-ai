@@ -6,28 +6,28 @@
 
 @layer base {
   :root {
-    /* Core Brand Colors */
-    --primary: 200 95% 45%;        /* Certifica Blue */
+    /* Core Brand Colors - Sky Theme */
+    --primary: 200 98% 48%;        /* Sky-600 */
     --primary-foreground: 0 0% 100%;
-    --primary-light: 200 85% 55%;
-    --primary-dark: 200 95% 35%;
+    --primary-light: 200 95% 55%;  /* Sky-400 */
+    --primary-dark: 200 98% 39%;   /* Sky-700 */
     
     /* Secondary Colors */
-    --secondary: 210 15% 96%;
-    --secondary-foreground: 210 15% 20%;
-    --accent: 45 93% 58%;          /* Success Gold */
-    --accent-foreground: 0 0% 0%;
+    --secondary: 200 12% 95%;      /* Sky-50 */
+    --secondary-foreground: 200 12% 25%;
+    --accent: 200 95% 39%;         /* Sky-500 for accents */
+    --accent-foreground: 0 0% 100%;
     
     /* Neutral Palette */
-    --background: 210 20% 98%;
-    --foreground: 210 15% 15%;
+    --background: 210 20% 97%;     /* Light gray background */
+    --foreground: 212 25% 15%;     /* Dark gray text */
     --card: 0 0% 100%;
-    --card-foreground: 210 15% 15%;
+    --card-foreground: 212 25% 15%;
     --muted: 210 15% 93%;
     --muted-foreground: 210 10% 45%;
     --border: 210 20% 88%;
     --input: 210 20% 88%;
-    --ring: 200 95% 45%;
+    --ring: 200 98% 48%;
     
     /* Status Colors */
     --success: 142 76% 36%;
