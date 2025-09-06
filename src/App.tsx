@@ -1,27 +1,47 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
+import React from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
 
-const queryClient = new QueryClient();
+import Header from './componets/Header';
+import ProtectedRoute from './componets/ProtectedRoute';
+import HomePage from './pages/HomePage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import DashboardPage from './pages/DashboardPage';
+import AnalisisCVPage from './pages/AnalisisCVPage';
+import StandardsPage from './pages/StandardsPage';
+import StandardDetailPage from './pages/StandardDetailPage';
+import MyCoursesPage from './pages/MyCoursesPage';
+import OpportunitiesPage from './pages/OpportunitiesPage';
+import NotFoundPage from './pages/NotFoundPage';
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App: React.FC = () => {
+  const location = useLocation();
+  const showHeader = location.pathname !== '/';
+
+  return (
+    <AuthProvider>
+      <div className="bg-background min-h-screen font-sans">
+        {showHeader && <Header />}
+        <main className={showHeader ? "pt-16" : ""}>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            
+            <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+            <Route path="/analisis-cv" element={<ProtectedRoute><AnalisisCVPage /></ProtectedRoute>} />
+            <Route path="/estandares" element={<ProtectedRoute><StandardsPage /></ProtectedRoute>} />
+            <Route path="/estandares/:standardCode" element={<ProtectedRoute><StandardDetailPage /></ProtectedRoute>} />
+            <Route path="/mis-cursos" element={<ProtectedRoute><MyCoursesPage /></ProtectedRoute>} />
+            <Route path="/oportunidades" element={<ProtectedRoute><OpportunitiesPage /></ProtectedRoute>} />
+
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </main>
+      </div>
+    </AuthProvider>
+  );
+};
 
 export default App;
