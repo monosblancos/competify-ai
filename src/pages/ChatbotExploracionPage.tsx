@@ -33,20 +33,22 @@ interface Message {
   content: string;
   timestamp: Date;
   suggestions?: string[];
-  technique?: TechniqueCard;
+  standard?: StandardCard;
   leadMagnet?: LeadMagnetOffer;
+  standards?: StandardCard[];
 }
 
-interface TechniqueCard {
+interface StandardCard {
+  code: string;
   title: string;
   category: string;
-  level: 'Principiante' | 'Intermedio' | 'Avanzado';
-  duration: string;
-  groupSize: string;
+  level: 'Nivel I' | 'Nivel II' | 'Nivel III' | 'Nivel IV' | 'Nivel V';
+  averageSalary: string;
+  demand: 'Alta' | 'Media' | 'Muy Alta';
   rating: number;
   tags: string[];
   description: string;
-  usageCount: number;
+  certifiedProfessionals: number;
 }
 
 interface LeadMagnetOffer {
@@ -58,6 +60,7 @@ interface LeadMagnetOffer {
   features: string[];
   urgency: string;
   cta: string;
+  type: 'guide' | 'certification' | 'consultation';
 }
 
 const ChatbotExploracionPage: React.FC = () => {
@@ -66,13 +69,13 @@ const ChatbotExploracionPage: React.FC = () => {
     {
       id: '1',
       type: 'bot',
-      content: '¡Hola! 👋 Soy tu Coach de Facilitación IA. Tengo acceso a más de 150 técnicas profesionales para ayudarte a facilitar sesiones exitosas. ¿Qué tipo de facilitación necesitas hoy?',
+      content: '¡Hola! 👋 Soy tu Arquitecto de Trayectorias de Certificación con IA avanzada.\n\nEstoy aquí para ayudarte a encontrar la certificación profesional perfecta para ti. Los profesionales certificados ganan hasta un 99% más que los no certificados.\n\n✨ ¿Listo para transformar tu carrera?',
       timestamp: new Date(),
       suggestions: [
-        'Necesito técnicas de brainstorming',
-        '¿Cómo energizar mi equipo?',
-        'Técnicas para tomar decisiones',
-        'Ideas para abrir una reunión'
+        'Quiero certificarme en tecnología',
+        '¿Qué certificación me conviene más?',
+        'Busco aumentar mi salario',
+        'Analiza mi perfil profesional'
       ]
     }
   ]);
@@ -125,72 +128,96 @@ const ChatbotExploracionPage: React.FC = () => {
     scrollToBottom();
   }, [messages]);
 
-  const techniques: TechniqueCard[] = [
+  const featuredStandards: StandardCard[] = [
     {
-      title: 'Velocidad de la Energía',
-      category: 'Energizante',
-      level: 'Principiante',
-      duration: '3-5 min',
-      groupSize: '5-100 personas',
-      rating: 4.5,
-      tags: ['energía', 'movimiento', 'concentración', 'activación'],
-      description: 'Activador físico que incrementa energía y concentración del grupo',
-      usageCount: 1156
+      code: 'EC0217',
+      title: 'Impartir cursos de capacitación presenciales grupales',
+      category: 'Capacitación y Desarrollo',
+      level: 'Nivel III',
+      averageSalary: '$18,000 - $35,000 MXN',
+      demand: 'Muy Alta',
+      rating: 4.8,
+      tags: ['capacitación', 'educación', 'facilitación', 'desarrollo humano'],
+      description: 'Competencia para diseñar e impartir cursos de capacitación presenciales grupales, evaluando el aprendizaje conforme a los objetivos establecidos.',
+      certifiedProfessionals: 15420
     },
     {
-      title: 'Tormenta de Ideas Visual',
-      category: 'Brainstorming',
-      level: 'Intermedio',
-      duration: '20-30 min',
-      groupSize: '3-20 personas',
-      rating: 4.75,
-      tags: ['creatividad', 'visual', 'ideas', 'innovación'],
-      description: 'Generar ideas usando objetos y representaciones visuales para estimular creatividad',
-      usageCount: 834
+      code: 'EC0301',
+      title: 'Diseñar cursos de capacitación',
+      category: 'Diseño Instruccional',
+      level: 'Nivel IV',
+      averageSalary: '$25,000 - $45,000 MXN',
+      demand: 'Alta',
+      rating: 4.7,
+      tags: ['diseño instruccional', 'curriculo', 'pedagogía', 'evaluación'],
+      description: 'Diseñar cursos de capacitación presenciales, sus instrumentos de evaluación y material didáctico.',
+      certifiedProfessionals: 8934
     },
     {
-      title: 'Storytelling Colaborativo',
-      category: 'Colaboración',
-      level: 'Intermedio',
-      duration: '25-40 min',
-      groupSize: '6-20 personas',
-      rating: 4.6,
-      tags: ['narrativa', 'visión compartida', 'creatividad', 'integración'],
-      description: 'Crear narrativas grupales que integren perspectivas diversas y generen visión compartida',
-      usageCount: 445
+      code: 'EC0366',
+      title: 'Desarrollo de habilidades digitales',
+      category: 'Tecnología',
+      level: 'Nivel II',
+      averageSalary: '$22,000 - $40,000 MXN',
+      demand: 'Muy Alta',
+      rating: 4.9,
+      tags: ['tecnología', 'digital', 'innovación', 'transformación'],
+      description: 'Desarrollar habilidades digitales para el uso de tecnologías de información y comunicación.',
+      certifiedProfessionals: 12567
     }
   ];
 
   const leadMagnetOffers: LeadMagnetOffer[] = [
     {
-      title: '🎁 Manual Completo de Facilitación',
-      subtitle: '150+ técnicas profesionales con descuento especial',
-      originalPrice: 67,
-      currentPrice: 47,
-      discount: '30% OFF',
+      title: '📊 Guía Completa de Certificación CONOCER',
+      subtitle: 'Descubre tu ruta profesional ideal con +1,845 estándares',
+      originalPrice: 97,
+      currentPrice: 0,
+      discount: 'GRATIS',
       features: [
-        '150+ Técnicas Profesionales',
-        'Guías Paso a Paso',
-        'Casos de Estudio Reales',
-        'Adaptaciones por Contexto'
+        'Test de Orientación Profesional',
+        'Análisis de 1,845 Estándares',
+        'Proyección Salarial por Certificación',
+        'Mapa de Trayectorias Profesionales',
+        'ROI de cada Certificación'
       ],
-      urgency: 'Esta oferta expira en: 14:56',
-      cta: 'Descargar Manual'
+      urgency: 'Descarga limitada - Solo hoy',
+      cta: 'Descargar Guía Gratis',
+      type: 'guide'
     },
     {
-      title: '🚀 Certificación CONOCER EC0217',
-      subtitle: 'Impartir cursos de capacitación presenciales grupales',
-      originalPrice: 2500,
-      currentPrice: 1875,
-      discount: '25% OFF',
+      title: '🚀 Certificación CONOCER Premium',
+      subtitle: 'Certificación + Mentoring + Garantía de Colocación',
+      originalPrice: 3500,
+      currentPrice: 2450,
+      discount: '30% OFF',
       features: [
         'Certificación Oficial CONOCER',
-        'Validez Nacional e Internacional',
-        'Material Didáctico Completo',
-        'Seguimiento Personalizado'
+        'Mentoring 1:1 con Expertos',
+        'Material Didáctico Premium',
+        'Garantía de Colocación Laboral',
+        'Network de Profesionales Certificados'
       ],
-      urgency: 'Últimos cupos disponibles',
-      cta: 'Inscribirme Ahora'
+      urgency: 'Promoción termina en: 23:45:12',
+      cta: 'Inscribirme Premium',
+      type: 'certification'
+    },
+    {
+      title: '💡 Consultoría Personalizada',
+      subtitle: 'Análisis 1:1 de tu perfil y estrategia de certificación',
+      originalPrice: 500,
+      currentPrice: 297,
+      discount: '40% OFF',
+      features: [
+        'Sesión 1:1 de 60 minutos',
+        'Análisis DAFO Profesional',
+        'Plan de Certificación Personalizado',
+        'Proyección de ROI',
+        'Seguimiento por 3 meses'
+      ],
+      urgency: 'Solo 5 cupos disponibles esta semana',
+      cta: 'Agendar Consultoría',
+      type: 'consultation'
     }
   ];
 
@@ -244,36 +271,47 @@ const ChatbotExploracionPage: React.FC = () => {
     const standards = await searchRelatedStandards(userInput);
     
     // Lead magnet triggers (only show in conversation after significant interaction)
-    if (messages.length > 5 && (lowerInput.includes('técnica') || lowerInput.includes('manual') || lowerInput.includes('guía'))) {
+    if (messages.length > 5 && (lowerInput.includes('guía') || lowerInput.includes('ayuda') || lowerInput.includes('orientación'))) {
       return {
         id: Date.now().toString(),
         type: 'bot',
-        content: '¡Perfecto! Veo que necesitas técnicas especializadas. Tengo exactamente lo que buscas.',
+        content: '¡Perfecto! Veo que necesitas orientación profesional personalizada. Tengo exactamente lo que buscas para acelerar tu carrera.',
         timestamp: new Date(),
         leadMagnet: leadMagnetOffers[0],
-        suggestions: ['¿Tienes más técnicas?', 'Me interesa la certificación', 'Quiero contacto personalizado']
+        suggestions: ['¿Cómo funciona la certificación?', 'Quiero consultoría personalizada', 'Mostrar más estándares']
       };
     }
 
-    if (lowerInput.includes('brainstorm') || lowerInput.includes('ideas') || lowerInput.includes('creatividad')) {
+    if (lowerInput.includes('tecnología') || lowerInput.includes('digital') || lowerInput.includes('ti') || lowerInput.includes('sistemas')) {
       return {
         id: Date.now().toString(),
         type: 'bot',
-        content: '¡Excelente! Para generar ideas innovadoras, te recomiendo esta técnica probada:',
+        content: '¡Excelente elección! El sector tecnológico tiene una demanda muy alta. Te recomiendo este estándar con gran proyección:',
         timestamp: new Date(),
-        technique: techniques[1],
-        suggestions: ['¿Cómo energizar mi equipo?', 'Técnicas para tomar decisiones', 'Ver más técnicas de creatividad']
+        standard: featuredStandards[2],
+        suggestions: ['¿Qué otros estándares en tecnología hay?', 'Quiero ver el salario promedio', 'Me interesa certificarme']
       };
     }
 
-    if (lowerInput.includes('energía') || lowerInput.includes('motivar') || lowerInput.includes('activar')) {
+    if (lowerInput.includes('capacitación') || lowerInput.includes('enseñar') || lowerInput.includes('formación') || lowerInput.includes('educar')) {
       return {
         id: Date.now().toString(),
         type: 'bot',
-        content: '¡Perfecto para activar a tu equipo! Esta técnica es ideal para incrementar la energía:',
+        content: '¡Perfecto! La capacitación es un sector con alta demanda y excelentes oportunidades. Te muestro el estándar más popular:',
         timestamp: new Date(),
-        technique: techniques[0],
-        suggestions: ['Técnicas para mantener atención', 'Ideas para abrir una reunión', 'Técnicas de concentración']
+        standard: featuredStandards[0],
+        suggestions: ['¿Cuánto ganan los capacitadores?', 'Ver proceso de certificación', 'Mostrar estándares relacionados']
+      };
+    }
+
+    if (lowerInput.includes('salario') || lowerInput.includes('sueldo') || lowerInput.includes('ganar') || lowerInput.includes('dinero')) {
+      return {
+        id: Date.now().toString(),
+        type: 'bot',
+        content: '¡Excelente pregunta! Los profesionales certificados pueden aumentar significativamente sus ingresos. Te muestro algunos estándares con alta remuneración:',
+        timestamp: new Date(),
+        standards: featuredStandards,
+        suggestions: ['¿Cuál me conviene más?', 'Quiero consultoría personalizada', 'Ver todos los estándares']
       };
     }
 
@@ -281,10 +319,21 @@ const ChatbotExploracionPage: React.FC = () => {
       return {
         id: Date.now().toString(),
         type: 'bot',
-        content: '¡Excelente decisión! La certificación CONOCER te abrirá nuevas oportunidades profesionales.',
+        content: '¡Excelente decisión! La certificación CONOCER es tu mejor inversión profesional. Te ayudo a elegir la opción perfecta para ti.',
         timestamp: new Date(),
         leadMagnet: leadMagnetOffers[1],
-        suggestions: ['¿Qué beneficios tiene?', 'Quiero más información', 'Contacto personalizado']
+        suggestions: ['¿Qué beneficios tiene?', 'Quiero consultoría 1:1', 'Ver certificaciones disponibles']
+      };
+    }
+
+    if (lowerInput.includes('consultoría') || lowerInput.includes('asesoría') || lowerInput.includes('personalizado') || lowerInput.includes('1:1')) {
+      return {
+        id: Date.now().toString(),
+        type: 'bot',
+        content: '¡Perfecto! Una consultoría personalizada es la mejor forma de acelerar tu certificación. Te ayudo a crear tu estrategia profesional.',
+        timestamp: new Date(),
+        leadMagnet: leadMagnetOffers[2],
+        suggestions: ['¿Cómo funciona?', 'Ver disponibilidad', 'Conocer metodología']
       };
     }
 
@@ -293,25 +342,37 @@ const ChatbotExploracionPage: React.FC = () => {
       return {
         id: Date.now().toString(),
         type: 'bot',
-        content: `¡Excelente! Encontré ${standards.length} estándares relacionados con tu consulta. Estos podrían ser perfectos para tu desarrollo profesional:`,
+        content: `¡Excelente! Encontré ${standards.length} estándares CONOCER relacionados con tu consulta. Estos podrían ser perfectos para tu crecimiento profesional y aumento salarial:`,
         timestamp: new Date(),
-        suggestions: standards.map(s => `Ver ${s.code}: ${s.title.substring(0, 30)}...`)
+        standards: standards.slice(0, 3).map(s => ({
+          code: s.code,
+          title: s.title,
+          category: s.category || 'Competencia Profesional',
+          level: 'Nivel III' as const,
+          averageSalary: '$20,000 - $35,000 MXN',
+          demand: 'Alta' as const,
+          rating: 4.5,
+          tags: ['certificación', 'conocer', 'competencia'],
+          description: s.description || 'Estándar de competencia profesional reconocido nacionalmente.',
+          certifiedProfessionals: Math.floor(Math.random() * 10000) + 1000
+        })),
+        suggestions: standards.slice(0, 3).map(s => `Ver ${s.code}: ${s.title.substring(0, 30)}...`)
       };
     }
 
-    // Default responses with technique suggestions
+    // Default responses with standard suggestions
     const responses = [
       {
-        content: '¡Genial! Para esa situación, te sugiero esta técnica colaborativa:',
-        technique: techniques[2]
+        content: '¡Genial! Basado en tu consulta, te recomiendo este estándar de competencia muy demandado:',
+        standard: featuredStandards[0]
       },
       {
-        content: 'Te entiendo perfectamente. Aquí tienes una técnica muy efectiva:',
-        technique: techniques[0]
+        content: 'Te entiendo perfectamente. Aquí tienes un estándar con excelente proyección salarial:',
+        standard: featuredStandards[1]
       },
       {
-        content: '¡Esa es una excelente pregunta! Te comparto esta técnica especializada:',
-        technique: techniques[1]
+        content: '¡Esa es una excelente pregunta! Te comparto este estándar con alta demanda laboral:',
+        standard: featuredStandards[2]
       }
     ];
 
@@ -322,12 +383,12 @@ const ChatbotExploracionPage: React.FC = () => {
       type: 'bot',
       content: randomResponse.content,
       timestamp: new Date(),
-      technique: randomResponse.technique,
+      standard: randomResponse.standard,
       suggestions: [
-        'Necesito más técnicas como esta',
-        'Buscar estándares relacionados',
-        'Me interesa certificarme',
-        'Contacto personalizado'
+        'Ver más estándares similares',
+        '¿Cuánto puedo ganar con esto?',
+        'Quiero certificarme',
+        'Consultoría personalizada'
       ]
     };
   };
@@ -352,15 +413,19 @@ const ChatbotExploracionPage: React.FC = () => {
     });
   };
 
-  const TechniqueDisplay: React.FC<{ technique: TechniqueCard }> = ({ technique }) => (
+  const StandardDisplay: React.FC<{ standard: StandardCard }> = ({ standard }) => (
     <Card className="mt-4 border-l-4 border-l-primary">
       <CardContent className="p-6">
         <div className="flex items-start justify-between mb-4">
           <div>
-            <h3 className="text-lg font-semibold text-foreground">{technique.title}</h3>
-            <div className="flex items-center gap-2 mt-1">
-              <Badge variant="secondary">{technique.level}</Badge>
-              <Badge variant="outline">{technique.category}</Badge>
+            <h3 className="text-lg font-semibold text-foreground">{standard.code}</h3>
+            <p className="text-sm font-medium text-foreground mt-1">{standard.title}</p>
+            <div className="flex items-center gap-2 mt-2">
+              <Badge variant="secondary">{standard.level}</Badge>
+              <Badge variant="outline">{standard.category}</Badge>
+              <Badge variant={standard.demand === 'Muy Alta' ? 'default' : 'secondary'}>
+                Demanda: {standard.demand}
+              </Badge>
             </div>
           </div>
           <Button variant="ghost" size="sm">
@@ -368,25 +433,34 @@ const ChatbotExploracionPage: React.FC = () => {
           </Button>
         </div>
 
-        <p className="text-muted-foreground mb-4">{technique.description}</p>
+        <p className="text-muted-foreground mb-4">{standard.description}</p>
 
         <div className="grid grid-cols-3 gap-4 mb-4">
           <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm">{technique.duration}</span>
+            <TrendingUp className="h-4 w-4 text-green-600" />
+            <div>
+              <span className="text-sm font-medium text-green-600">{standard.averageSalary}</span>
+              <p className="text-xs text-muted-foreground">Salario promedio</p>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <Users className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm">{technique.groupSize}</span>
+            <div>
+              <span className="text-sm font-medium">{standard.certifiedProfessionals.toLocaleString()}</span>
+              <p className="text-xs text-muted-foreground">Certificados</p>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <Star className="h-4 w-4 text-yellow-500 fill-current" />
-            <span className="text-sm">{technique.rating}/5</span>
+            <div>
+              <span className="text-sm font-medium">{standard.rating}/5</span>
+              <p className="text-xs text-muted-foreground">Rating</p>
+            </div>
           </div>
         </div>
 
         <div className="flex flex-wrap gap-2 mb-4">
-          {technique.tags.map((tag, index) => (
+          {standard.tags.map((tag, index) => (
             <Badge key={index} variant="outline" className="text-xs">
               {tag}
             </Badge>
@@ -395,19 +469,52 @@ const ChatbotExploracionPage: React.FC = () => {
 
         <div className="flex items-center justify-between">
           <span className="text-xs text-muted-foreground">
-            Usada {technique.usageCount} veces por facilitadores
+            +99% de aumento salarial promedio después de certificación
           </span>
           <div className="flex gap-2">
             <Button size="sm" variant="outline">
               Ver Detalles
             </Button>
-            <Button size="sm" className="bg-black text-white hover:bg-gray-800">
-              Usar Técnica
+            <Button size="sm">
+              Certificarme
             </Button>
           </div>
         </div>
       </CardContent>
     </Card>
+  );
+
+  const StandardsListDisplay: React.FC<{ standards: StandardCard[] }> = ({ standards }) => (
+    <div className="mt-4 space-y-3">
+      {standards.map((standard, index) => (
+        <Card key={index} className="border border-border">
+          <CardContent className="p-4">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <Badge variant="outline" className="text-xs">{standard.code}</Badge>
+                  <Badge variant={standard.demand === 'Muy Alta' ? 'default' : 'secondary'} className="text-xs">
+                    {standard.demand}
+                  </Badge>
+                </div>
+                <h4 className="font-medium text-sm text-foreground mb-1">{standard.title}</h4>
+                <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{standard.description}</p>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-green-600">{standard.averageSalary}</span>
+                  <div className="flex items-center gap-1">
+                    <Star className="h-3 w-3 text-yellow-500 fill-current" />
+                    <span className="text-xs">{standard.rating}</span>
+                  </div>
+                </div>
+              </div>
+              <Button size="sm" variant="outline" className="ml-3">
+                Ver
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
   );
 
   const LeadMagnetDisplay: React.FC<{ offer: LeadMagnetOffer }> = ({ offer }) => (
@@ -484,7 +591,7 @@ const ChatbotExploracionPage: React.FC = () => {
         </DialogHeader>
         <div className="space-y-4">
           <p className="text-muted-foreground">
-            Antes de irte, déjame ofrecerte nuestro manual completo con más de 150 técnicas profesionales.
+            Antes de irte, déjame ofrecerte nuestra guía gratuita para encontrar tu certificación CONOCER ideal.
           </p>
           <LeadMagnetDisplay offer={leadMagnetOffers[0]} />
         </div>
@@ -509,9 +616,9 @@ const ChatbotExploracionPage: React.FC = () => {
           <div>
             <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
               <Bot className="h-6 w-6 text-primary" />
-              Coach de Facilitación IA
+              Sistema de Orientación CONOCER
             </h1>
-            <p className="text-muted-foreground text-sm">Tu asistente experto en técnicas de facilitación</p>
+            <p className="text-muted-foreground text-sm">Tu Arquitecto de Trayectorias de Certificación con IA</p>
           </div>
           <div className="text-right">
             <div className="text-foreground text-sm mb-1">Progreso</div>
@@ -550,7 +657,8 @@ const ChatbotExploracionPage: React.FC = () => {
                     <div className="flex-1">
                       <p className="whitespace-pre-wrap">{message.content}</p>
                       
-                      {message.technique && <TechniqueDisplay technique={message.technique} />}
+                      {message.standard && <StandardDisplay standard={message.standard} />}
+                      {message.standards && <StandardsListDisplay standards={message.standards} />}
                       {message.leadMagnet && <LeadMagnetDisplay offer={message.leadMagnet} />}
                       
                       {message.suggestions && (
@@ -601,7 +709,7 @@ const ChatbotExploracionPage: React.FC = () => {
           <CardContent className="p-4">
             <div className="flex gap-2">
               <Textarea
-                placeholder="Describe tu situación o el tipo de técnica que necesitas..."
+                placeholder="Describe tu perfil profesional o el área en la que te quieres certificar..."
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={(e) => {
