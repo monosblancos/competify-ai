@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { 
   Send, 
   Bot, 
@@ -20,9 +21,11 @@ import {
   Heart,
   TrendingUp,
   Target,
-  Award
+  Award,
+  X
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Message {
   id: string;
@@ -83,8 +86,36 @@ const ChatbotExploracionPage: React.FC = () => {
     interests: [] as string[],
     currentStep: 1
   });
+  const [showExitModal, setShowExitModal] = useState(false);
+  const [relatedStandards, setRelatedStandards] = useState<any[]>([]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Exit intent detection
+  useEffect(() => {
+    let timeSpent = 0;
+    const startTime = Date.now();
+    const timeInterval = setInterval(() => {
+      timeSpent = Date.now() - startTime;
+    }, 1000);
+
+    const handleMouseLeave = (e: MouseEvent) => {
+      if (
+        timeSpent > 30000 && // 30 seconds minimum
+        e.clientY <= 0 &&
+        !showExitModal &&
+        messages.length > 3 // User has interacted
+      ) {
+        setShowExitModal(true);
+      }
+    };
+
+    document.addEventListener('mouseleave', handleMouseLeave);
+    return () => {
+      clearInterval(timeInterval);
+      document.removeEventListener('mouseleave', handleMouseLeave);
+    };
+  }, [showExitModal, messages.length]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -179,19 +210,41 @@ const ChatbotExploracionPage: React.FC = () => {
     setProgress(prev => Math.min(prev + 10, 90));
 
     // Simulate AI processing
-    setTimeout(() => {
-      const botResponse = generateBotResponse(content);
+    setTimeout(async () => {
+      const botResponse = await generateBotResponse(content);
       setMessages(prev => [...prev, botResponse]);
       setIsTyping(false);
       setProgress(prev => Math.min(prev + 5, 100));
     }, 1500);
   };
 
-  const generateBotResponse = (userInput: string): Message => {
+  // Search related standards
+  const searchRelatedStandards = async (query: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('standards')
+        .select('code, title, description, category')
+        .or(`title.ilike.%${query}%,description.ilike.%${query}%,category.ilike.%${query}%`)
+        .limit(3);
+      
+      if (!error && data) {
+        setRelatedStandards(data);
+        return data;
+      }
+    } catch (error) {
+      console.error('Error searching standards:', error);
+    }
+    return [];
+  };
+
+  const generateBotResponse = async (userInput: string): Promise<Message> => {
     const lowerInput = userInput.toLowerCase();
     
-    // Lead magnet triggers
-    if (lowerInput.includes('técnica') || lowerInput.includes('manual') || lowerInput.includes('guía')) {
+    // Search for related standards
+    const standards = await searchRelatedStandards(userInput);
+    
+    // Lead magnet triggers (only show in conversation after significant interaction)
+    if (messages.length > 5 && (lowerInput.includes('técnica') || lowerInput.includes('manual') || lowerInput.includes('guía'))) {
       return {
         id: Date.now().toString(),
         type: 'bot',
@@ -224,7 +277,7 @@ const ChatbotExploracionPage: React.FC = () => {
       };
     }
 
-    if (lowerInput.includes('certificación') || lowerInput.includes('certificar') || lowerInput.includes('conocer')) {
+    if (messages.length > 5 && (lowerInput.includes('certificación') || lowerInput.includes('certificar') || lowerInput.includes('conocer'))) {
       return {
         id: Date.now().toString(),
         type: 'bot',
@@ -232,6 +285,17 @@ const ChatbotExploracionPage: React.FC = () => {
         timestamp: new Date(),
         leadMagnet: leadMagnetOffers[1],
         suggestions: ['¿Qué beneficios tiene?', 'Quiero más información', 'Contacto personalizado']
+      };
+    }
+
+    // Show related standards if found
+    if (standards.length > 0) {
+      return {
+        id: Date.now().toString(),
+        type: 'bot',
+        content: `¡Excelente! Encontré ${standards.length} estándares relacionados con tu consulta. Estos podrían ser perfectos para tu desarrollo profesional:`,
+        timestamp: new Date(),
+        suggestions: standards.map(s => `Ver ${s.code}: ${s.title.substring(0, 30)}...`)
       };
     }
 
@@ -261,7 +325,7 @@ const ChatbotExploracionPage: React.FC = () => {
       technique: randomResponse.technique,
       suggestions: [
         'Necesito más técnicas como esta',
-        'Quiero el manual completo',
+        'Buscar estándares relacionados',
         'Me interesa certificarme',
         'Contacto personalizado'
       ]
@@ -409,23 +473,51 @@ const ChatbotExploracionPage: React.FC = () => {
     </Card>
   );
 
+  const ExitIntentModal = () => (
+    <Dialog open={showExitModal} onOpenChange={setShowExitModal}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Award className="h-5 w-5 text-primary" />
+            ¡Espera! No te vayas sin esto
+          </DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <p className="text-muted-foreground">
+            Antes de irte, déjame ofrecerte nuestro manual completo con más de 150 técnicas profesionales.
+          </p>
+          <LeadMagnetDisplay offer={leadMagnetOffers[0]} />
+        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="absolute right-4 top-4"
+          onClick={() => setShowExitModal(false)}
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      </DialogContent>
+    </Dialog>
+  );
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-background/90 relative">
+      <ExitIntentModal />
       {/* Header */}
-      <div className="bg-white/10 backdrop-blur-sm border-b border-white/20">
+      <div className="bg-card/95 backdrop-blur-sm border-b border-border shadow-sm">
         <div className="max-w-4xl mx-auto p-4 flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-white flex items-center gap-2">
-              <Bot className="h-6 w-6" />
+            <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
+              <Bot className="h-6 w-6 text-primary" />
               Coach de Facilitación IA
             </h1>
-            <p className="text-white/80 text-sm">Tu asistente experto en técnicas de facilitación</p>
+            <p className="text-muted-foreground text-sm">Tu asistente experto en técnicas de facilitación</p>
           </div>
           <div className="text-right">
-            <div className="text-white text-sm mb-1">Progreso</div>
+            <div className="text-foreground text-sm mb-1">Progreso</div>
             <div className="flex items-center gap-2">
               <Progress value={progress} className="w-20 h-2" />
-              <span className="text-white/80 text-sm font-medium">{progress}%</span>
+              <span className="text-muted-foreground text-sm font-medium">{progress}%</span>
             </div>
           </div>
         </div>
@@ -442,18 +534,18 @@ const ChatbotExploracionPage: React.FC = () => {
             >
               <div className="max-w-[80%]">
                 <div
-                  className={`p-4 rounded-2xl ${
+                  className={`p-4 rounded-2xl shadow-sm border ${
                     message.type === 'user'
-                      ? 'bg-white text-gray-900'
-                      : 'bg-white/90 text-gray-900'
+                      ? 'bg-primary text-primary-foreground border-primary/20'
+                      : 'bg-card text-card-foreground border-border'
                   }`}
                 >
                   <div className="flex items-start gap-3">
                     {message.type === 'bot' && (
-                      <Bot className="h-6 w-6 mt-1 text-purple-600 flex-shrink-0" />
+                      <Bot className="h-6 w-6 mt-1 text-primary flex-shrink-0" />
                     )}
                     {message.type === 'user' && (
-                      <User className="h-6 w-6 mt-1 text-blue-600 flex-shrink-0" />
+                      <User className="h-6 w-6 mt-1 text-primary-foreground flex-shrink-0" />
                     )}
                     <div className="flex-1">
                       <p className="whitespace-pre-wrap">{message.content}</p>
@@ -489,13 +581,13 @@ const ChatbotExploracionPage: React.FC = () => {
           
           {isTyping && (
             <div className="flex justify-start">
-              <div className="bg-white/90 p-4 rounded-2xl max-w-[80%]">
+              <div className="bg-card p-4 rounded-2xl max-w-[80%] shadow-sm border border-border">
                 <div className="flex items-center gap-3">
-                  <Bot className="h-6 w-6 text-purple-600" />
+                  <Bot className="h-6 w-6 text-primary" />
                   <div className="flex gap-1">
-                    <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                    <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
                   </div>
                 </div>
               </div>
@@ -505,7 +597,7 @@ const ChatbotExploracionPage: React.FC = () => {
         </div>
 
         {/* Input */}
-        <Card className="bg-white/90 backdrop-blur-sm">
+        <Card className="bg-card/95 backdrop-blur-sm border border-border shadow-lg">
           <CardContent className="p-4">
             <div className="flex gap-2">
               <Textarea
@@ -518,12 +610,12 @@ const ChatbotExploracionPage: React.FC = () => {
                     handleSendMessage();
                   }
                 }}
-                className="flex-1 min-h-[60px] resize-none"
+                className="flex-1 min-h-[60px] resize-none bg-background"
                 rows={2}
               />
               <Button 
                 onClick={() => handleSendMessage()}
-                className="bg-purple-600 hover:bg-purple-700 text-white self-end"
+                className="self-end"
                 size="lg"
               >
                 <Send className="h-5 w-5" />
