@@ -56,7 +56,7 @@ const HomePage: React.FC = () => {
             {/* Video/Demo Section */}
             <div className="relative mb-12 max-w-4xl mx-auto">
               <a 
-                href="https://youtu.be/_mxyHhd1PZM" 
+                href="https://www.youtube.com/watch?v=_mxyHhd1PZM" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="block aspect-video bg-gradient-to-r from-primary/20 to-accent/20 rounded-2xl border-2 border-white/20 flex items-center justify-center group cursor-pointer hover:scale-105 transition-transform"
