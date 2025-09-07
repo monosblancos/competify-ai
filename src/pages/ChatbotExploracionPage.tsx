@@ -25,7 +25,7 @@ import {
   X
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { ragChatbot, RAGChatbotResponse } from '@/services/ragChatbotService';
 import { useStandardsSearch } from '@/hooks/useStandardsSearch';
 
 interface Message {
@@ -66,7 +66,7 @@ interface LeadMagnetOffer {
 
 const ChatbotExploracionPage: React.FC = () => {
   const { toast } = useToast();
-  const { searchByKeywords, searchStandards, getRandomStandards, isSearching } = useStandardsSearch();
+  const { getRandomStandards, isSearching } = useStandardsSearch();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -238,13 +238,31 @@ const ChatbotExploracionPage: React.FC = () => {
     setIsTyping(true);
     setProgress(prev => Math.min(prev + 10, 90));
 
-    // Simulate AI processing
-    setTimeout(async () => {
-      const botResponse = await generateBotResponse(content);
+    try {
+      // Use RAG chatbot service instead of hardcoded responses
+      const ragResponse = await ragChatbot.sendMessage(content.trim());
+      const botResponse = await generateBotResponseFromRAG(ragResponse, content);
       setMessages(prev => [...prev, botResponse]);
-      setIsTyping(false);
       setProgress(prev => Math.min(prev + 5, 100));
-    }, 1500);
+    } catch (error) {
+      console.error('Error in RAG chatbot:', error);
+      // Fallback to basic response
+      const fallbackResponse: Message = {
+        id: Date.now().toString(),
+        type: 'bot',
+        content: 'Lo siento, hubo un error procesando tu consulta. Por favor intenta nuevamente con una pregunta más específica sobre estándares de competencia.',
+        timestamp: new Date(),
+        suggestions: [
+          'Quiero trabajar en tecnología',
+          'Me interesa la capacitación',
+          'Busco aumentar mi salario',
+          'Consultoría personalizada'
+        ]
+      };
+      setMessages(prev => [...prev, fallbackResponse]);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   // Convert database standard to StandardCard format
@@ -263,71 +281,27 @@ const ChatbotExploracionPage: React.FC = () => {
     };
   };
 
-  const generateBotResponse = async (userInput: string): Promise<Message> => {
+  // Generate bot response from RAG service response
+  const generateBotResponseFromRAG = async (ragResponse: RAGChatbotResponse, userInput: string): Promise<Message> => {
     const lowerInput = userInput.toLowerCase();
-    
-    // Search for related standards using the new hook
-    let relatedDbStandards: any[] = [];
     
     // Lead magnet triggers (only show in conversation after significant interaction)
     if (messages.length > 5 && (lowerInput.includes('guía') || lowerInput.includes('ayuda') || lowerInput.includes('orientación'))) {
       return {
         id: Date.now().toString(),
         type: 'bot',
-        content: '¡Perfecto! Veo que necesitas orientación profesional personalizada. Tengo exactamente lo que buscas para acelerar tu carrera.',
+        content: ragResponse.message + '\n\n¡Perfecto! También tengo herramientas adicionales que te pueden ayudar a acelerar tu certificación:',
         timestamp: new Date(),
         leadMagnet: leadMagnetOffers[0],
         suggestions: ['¿Cómo funciona la certificación?', 'Quiero consultoría personalizada', 'Mostrar más estándares']
       };
     }
 
-    if (lowerInput.includes('tecnología') || lowerInput.includes('digital') || lowerInput.includes('ti') || lowerInput.includes('sistemas') || lowerInput.includes('línea') || lowerInput.includes('online')) {
-      relatedDbStandards = await searchByKeywords(['tecnología', 'digital', 'línea', 'online', 'cursos']);
-      if (relatedDbStandards.length > 0) {
-        return {
-          id: Date.now().toString(),
-          type: 'bot',
-          content: '¡Excelente elección! El sector tecnológico tiene una demanda muy alta. Te recomiendo este estándar con gran proyección:',
-          timestamp: new Date(),
-          standard: convertToStandardCard(relatedDbStandards[0]),
-          suggestions: ['¿Qué otros estándares en tecnología hay?', 'Quiero ver el salario promedio', 'Me interesa certificarme']
-        };
-      }
-    }
-
-    if (lowerInput.includes('capacitación') || lowerInput.includes('enseñar') || lowerInput.includes('formación') || lowerInput.includes('educar')) {
-      relatedDbStandards = await searchByKeywords(['capacitación', 'formación', 'cursos', 'educación']);
-      if (relatedDbStandards.length > 0) {
-        return {
-          id: Date.now().toString(),
-          type: 'bot',
-          content: '¡Perfecto! La capacitación es un sector con alta demanda y excelentes oportunidades. Te muestro el estándar más popular:',
-          timestamp: new Date(),
-          standard: convertToStandardCard(relatedDbStandards[0]),
-          suggestions: ['¿Cuánto ganan los capacitadores?', 'Ver proceso de certificación', 'Mostrar estándares relacionados']
-        };
-      }
-    }
-
-    if (lowerInput.includes('salario') || lowerInput.includes('sueldo') || lowerInput.includes('ganar') || lowerInput.includes('dinero')) {
-      relatedDbStandards = await getRandomStandards(3);
-      if (relatedDbStandards.length > 0) {
-        return {
-          id: Date.now().toString(),
-          type: 'bot',
-          content: '¡Excelente pregunta! Los profesionales certificados pueden aumentar significativamente sus ingresos. Te muestro algunos estándares con alta remuneración:',
-          timestamp: new Date(),
-          standards: relatedDbStandards.map(convertToStandardCard),
-          suggestions: ['¿Cuál me conviene más?', 'Quiero consultoría personalizada', 'Ver todos los estándares']
-        };
-      }
-    }
-
     if (messages.length > 5 && (lowerInput.includes('certificación') || lowerInput.includes('certificar') || lowerInput.includes('conocer'))) {
       return {
         id: Date.now().toString(),
         type: 'bot',
-        content: '¡Excelente decisión! La certificación CONOCER es tu mejor inversión profesional. Te ayudo a elegir la opción perfecta para ti.',
+        content: ragResponse.message + '\n\n¡Excelente decisión! Te ayudo a elegir la opción perfecta para tu certificación:',
         timestamp: new Date(),
         leadMagnet: leadMagnetOffers[1],
         suggestions: ['¿Qué beneficios tiene?', 'Quiero consultoría 1:1', 'Ver certificaciones disponibles']
@@ -338,62 +312,65 @@ const ChatbotExploracionPage: React.FC = () => {
       return {
         id: Date.now().toString(),
         type: 'bot',
-        content: '¡Perfecto! Una consultoría personalizada es la mejor forma de acelerar tu certificación. Te ayudo a crear tu estrategia profesional.',
+        content: ragResponse.message + '\n\n¡Perfecto! Una consultoría personalizada es la mejor forma de acelerar tu proceso:',
         timestamp: new Date(),
         leadMagnet: leadMagnetOffers[2],
         suggestions: ['¿Cómo funciona?', 'Ver disponibilidad', 'Conocer metodología']
       };
     }
 
-    // Search for standards based on user input as fallback
-    relatedDbStandards = await searchStandards(userInput);
-    if (relatedDbStandards.length > 0) {
-      return {
-        id: Date.now().toString(),
-        type: 'bot',
-        content: `¡Excelente! Encontré ${relatedDbStandards.length} estándares CONOCER relacionados con tu consulta. Estos podrían ser perfectos para tu crecimiento profesional y aumento salarial:`,
-        timestamp: new Date(),
-        standards: relatedDbStandards.slice(0, 3).map(convertToStandardCard),
-        suggestions: relatedDbStandards.slice(0, 3).map(s => `Ver ${s.code}: ${s.title.substring(0, 30)}...`)
-      };
+    // If we have relevant standards, show them
+    if (ragResponse.relevantStandards && ragResponse.relevantStandards.length > 0) {
+      const standardsToShow = ragResponse.relevantStandards.slice(0, 3).map(standard => 
+        convertToStandardCard({
+          code: standard.code,
+          title: standard.title,
+          description: standard.description,
+          category: standard.category
+        })
+      );
+
+      if (standardsToShow.length === 1) {
+        return {
+          id: Date.now().toString(),
+          type: 'bot',
+          content: ragResponse.message,
+          timestamp: new Date(),
+          standard: standardsToShow[0],
+          suggestions: [
+            '¿Qué otros estándares similares hay?',
+            'Quiero ver el salario promedio',
+            'Me interesa certificarme',
+            'Consultoría personalizada'
+          ]
+        };
+      } else {
+        return {
+          id: Date.now().toString(),
+          type: 'bot',
+          content: ragResponse.message,
+          timestamp: new Date(),
+          standards: standardsToShow,
+          suggestions: [
+            '¿Cuál me conviene más?',
+            'Quiero consultoría personalizada',
+            'Ver todos los estándares',
+            'Mostrar más información'
+          ]
+        };
+      }
     }
 
-    // Default response - get a random standard from database
-    const randomStandards = await getRandomStandards(1);
-    if (randomStandards.length > 0) {
-      const responses = [
-        '¡Genial! Basado en tu consulta, te recomiendo este estándar de competencia muy demandado:',
-        'Te entiendo perfectamente. Aquí tienes un estándar con excelente proyección salarial:',
-        '¡Esa es una excelente pregunta! Te comparto este estándar con alta demanda laboral:'
-      ];
-
-      const randomContent = responses[Math.floor(Math.random() * responses.length)];
-      
-      return {
-        id: Date.now().toString(),
-        type: 'bot',
-        content: randomContent,
-        timestamp: new Date(),
-        standard: convertToStandardCard(randomStandards[0]),
-        suggestions: [
-          'Ver más estándares similares',
-          '¿Cuánto puedo ganar con esto?',
-          'Quiero certificarme',
-          'Consultoría personalizada'
-        ]
-      };
-    }
-
-    // Fallback response if no standards found
+    // Default response with suggestions
     return {
       id: Date.now().toString(),
       type: 'bot',
-      content: 'Entiendo tu consulta. Para darte una recomendación más precisa, ¿podrías contarme más sobre tu experiencia laboral o el área en la que te gustaría especializarte?',
+      content: ragResponse.message,
       timestamp: new Date(),
       suggestions: [
+        'Ver más estándares similares',
         'Quiero trabajar en tecnología',
         'Me interesa la capacitación',
-        'Busco aumentar mi salario',
         'Consultoría personalizada'
       ]
     };
@@ -624,13 +601,40 @@ const ChatbotExploracionPage: React.FC = () => {
               <Bot className="h-6 w-6 text-primary" />
               Sistema de Orientación CONOCER
             </h1>
-            <p className="text-muted-foreground text-sm">Tu Arquitecto de Trayectorias de Certificación con IA</p>
+            <p className="text-muted-foreground text-sm">RAG + Base de Datos CONOCER (1845 estándares)</p>
           </div>
-          <div className="text-right">
-            <div className="text-foreground text-sm mb-1">Progreso</div>
-            <div className="flex items-center gap-2">
-              <Progress value={progress} className="w-20 h-2" />
-              <span className="text-muted-foreground text-sm font-medium">{progress}%</span>
+          <div className="flex items-center gap-4">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={async () => {
+                try {
+                  toast({
+                    title: "Generando embeddings...",
+                    description: "Esto puede tomar varios minutos (primera vez)"
+                  });
+                  await ragChatbot.generateEmbeddings();
+                  toast({
+                    title: "¡Embeddings generados!",
+                    description: "El sistema RAG está ahora optimizado"
+                  });
+                } catch (error) {
+                  toast({
+                    title: "Error",
+                    description: "No se pudieron generar los embeddings",
+                    variant: "destructive"
+                  });
+                }
+              }}
+            >
+              Inicializar RAG
+            </Button>
+            <div className="text-right">
+              <div className="text-foreground text-sm mb-1">Progreso</div>
+              <div className="flex items-center gap-2">
+                <Progress value={progress} className="w-20 h-2" />
+                <span className="text-muted-foreground text-sm font-medium">{progress}%</span>
+              </div>
             </div>
           </div>
         </div>
