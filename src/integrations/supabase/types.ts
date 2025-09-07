@@ -71,6 +71,402 @@ export type Database = {
         }
         Relationships: []
       }
+      resource_access: {
+        Row: {
+          expires_at: string | null
+          granted_at: string | null
+          product_id: string
+          user_id: string
+        }
+        Insert: {
+          expires_at?: string | null
+          granted_at?: string | null
+          product_id: string
+          user_id: string
+        }
+        Update: {
+          expires_at?: string | null
+          granted_at?: string | null
+          product_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resource_access_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "resource_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resource_assets: {
+        Row: {
+          created_at: string | null
+          duration_minutes: number | null
+          id: string
+          kind: string
+          product_id: string
+          size_mb: number | null
+          sort_order: number | null
+          title: string
+          url: string
+        }
+        Insert: {
+          created_at?: string | null
+          duration_minutes?: number | null
+          id?: string
+          kind: string
+          product_id: string
+          size_mb?: number | null
+          sort_order?: number | null
+          title: string
+          url: string
+        }
+        Update: {
+          created_at?: string | null
+          duration_minutes?: number | null
+          id?: string
+          kind?: string
+          product_id?: string
+          size_mb?: number | null
+          sort_order?: number | null
+          title?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resource_assets_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "resource_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resource_bundle_items: {
+        Row: {
+          bundle_id: string
+          product_id: string
+          quantity: number | null
+        }
+        Insert: {
+          bundle_id: string
+          product_id: string
+          quantity?: number | null
+        }
+        Update: {
+          bundle_id?: string
+          product_id?: string
+          quantity?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resource_bundle_items_bundle_id_fkey"
+            columns: ["bundle_id"]
+            isOneToOne: false
+            referencedRelation: "resource_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "resource_bundle_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "resource_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resource_coupons: {
+        Row: {
+          active: boolean | null
+          code: string
+          created_at: string | null
+          discount_pct: number
+          expires_at: string | null
+          max_uses: number | null
+          used_count: number | null
+        }
+        Insert: {
+          active?: boolean | null
+          code: string
+          created_at?: string | null
+          discount_pct: number
+          expires_at?: string | null
+          max_uses?: number | null
+          used_count?: number | null
+        }
+        Update: {
+          active?: boolean | null
+          code?: string
+          created_at?: string | null
+          discount_pct?: number
+          expires_at?: string | null
+          max_uses?: number | null
+          used_count?: number | null
+        }
+        Relationships: []
+      }
+      resource_offer_interactions: {
+        Row: {
+          action: string
+          coupon_generated: string | null
+          created_at: string | null
+          offer_id: string | null
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          coupon_generated?: string | null
+          created_at?: string | null
+          offer_id?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          coupon_generated?: string | null
+          created_at?: string | null
+          offer_id?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resource_offer_interactions_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "resource_offers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resource_offers: {
+        Row: {
+          active: boolean | null
+          content: Json
+          cooldown_hours: number | null
+          created_at: string | null
+          discount_pct: number | null
+          expires_hours: number | null
+          id: string
+          max_shows_per_user: number | null
+          name: string
+          target_segment: string | null
+          trigger_event: string | null
+          type: string
+        }
+        Insert: {
+          active?: boolean | null
+          content: Json
+          cooldown_hours?: number | null
+          created_at?: string | null
+          discount_pct?: number | null
+          expires_hours?: number | null
+          id?: string
+          max_shows_per_user?: number | null
+          name: string
+          target_segment?: string | null
+          trigger_event?: string | null
+          type: string
+        }
+        Update: {
+          active?: boolean | null
+          content?: Json
+          cooldown_hours?: number | null
+          created_at?: string | null
+          discount_pct?: number | null
+          expires_hours?: number | null
+          id?: string
+          max_shows_per_user?: number | null
+          name?: string
+          target_segment?: string | null
+          trigger_event?: string | null
+          type?: string
+        }
+        Relationships: []
+      }
+      resource_order_items: {
+        Row: {
+          order_id: string
+          price_cents: number
+          product_id: string
+          quantity: number | null
+        }
+        Insert: {
+          order_id: string
+          price_cents: number
+          product_id: string
+          quantity?: number | null
+        }
+        Update: {
+          order_id?: string
+          price_cents?: number
+          product_id?: string
+          quantity?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resource_order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "resource_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "resource_order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "resource_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resource_orders: {
+        Row: {
+          amount_cents: number
+          coupon_code: string | null
+          created_at: string | null
+          currency: string
+          discount_cents: number | null
+          id: string
+          provider: string
+          provider_payment_id: string | null
+          provider_session_id: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string | null
+          utm: Json | null
+        }
+        Insert: {
+          amount_cents: number
+          coupon_code?: string | null
+          created_at?: string | null
+          currency?: string
+          discount_cents?: number | null
+          id?: string
+          provider: string
+          provider_payment_id?: string | null
+          provider_session_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          utm?: Json | null
+        }
+        Update: {
+          amount_cents?: number
+          coupon_code?: string | null
+          created_at?: string | null
+          currency?: string
+          discount_cents?: number | null
+          id?: string
+          provider?: string
+          provider_payment_id?: string | null
+          provider_session_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          utm?: Json | null
+        }
+        Relationships: []
+      }
+      resource_products: {
+        Row: {
+          bonuses: Json | null
+          cover_url: string | null
+          created_at: string | null
+          currency: string
+          curriculum: Json | null
+          description: string | null
+          duration: string | null
+          faq: Json | null
+          guarantee_days: number | null
+          hero_media_url: string | null
+          id: string
+          instructor: string | null
+          is_free: boolean | null
+          level: string | null
+          outcomes: Json | null
+          price_cents: number
+          published: boolean | null
+          rating: number | null
+          sector: string | null
+          seo: Json | null
+          slug: string
+          standards: string[] | null
+          subtitle: string | null
+          target_audience: Json | null
+          testimonials: Json | null
+          title: string
+          total_purchases: number | null
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          bonuses?: Json | null
+          cover_url?: string | null
+          created_at?: string | null
+          currency?: string
+          curriculum?: Json | null
+          description?: string | null
+          duration?: string | null
+          faq?: Json | null
+          guarantee_days?: number | null
+          hero_media_url?: string | null
+          id?: string
+          instructor?: string | null
+          is_free?: boolean | null
+          level?: string | null
+          outcomes?: Json | null
+          price_cents: number
+          published?: boolean | null
+          rating?: number | null
+          sector?: string | null
+          seo?: Json | null
+          slug: string
+          standards?: string[] | null
+          subtitle?: string | null
+          target_audience?: Json | null
+          testimonials?: Json | null
+          title: string
+          total_purchases?: number | null
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          bonuses?: Json | null
+          cover_url?: string | null
+          created_at?: string | null
+          currency?: string
+          curriculum?: Json | null
+          description?: string | null
+          duration?: string | null
+          faq?: Json | null
+          guarantee_days?: number | null
+          hero_media_url?: string | null
+          id?: string
+          instructor?: string | null
+          is_free?: boolean | null
+          level?: string | null
+          outcomes?: Json | null
+          price_cents?: number
+          published?: boolean | null
+          rating?: number | null
+          sector?: string | null
+          seo?: Json | null
+          slug?: string
+          standards?: string[] | null
+          subtitle?: string | null
+          target_audience?: Json | null
+          testimonials?: Json | null
+          title?: string
+          total_purchases?: number | null
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       standards: {
         Row: {
           category: string | null
