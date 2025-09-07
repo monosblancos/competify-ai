@@ -19,6 +19,9 @@ import NotFoundPage from './pages/NotFoundPage';
 import DiagnosticoPage from './pages/DiagnosticoPage';
 import ProgramasPage from './pages/ProgramasPage';
 import ChatbotExploracionPage from './pages/ChatbotExploracionPage';
+import ResourcesPage from './pages/ResourcesPage';
+import ResourceDetailPage from './pages/ResourceDetailPage';
+import MyLibraryPage from './pages/MyLibraryPage';
 
 const App: React.FC = () => {
   const location = useLocation();
@@ -46,6 +49,9 @@ const App: React.FC = () => {
             <Route path="/estandares/:standardCode" element={<StandardDetailPage />} />
             <Route path="/mis-cursos" element={<ProtectedRoute><MyCoursesPage /></ProtectedRoute>} />
             <Route path="/oportunidades" element={<OpportunitiesPage />} />
+            <Route path="/recursos" element={<ResourcesPage />} />
+            <Route path="/recursos/:slug" element={<ResourceDetailPage />} />
+            <Route path="/mi-biblioteca" element={<ProtectedRoute><MyLibraryPage /></ProtectedRoute>} />
 
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
