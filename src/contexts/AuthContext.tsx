@@ -74,6 +74,33 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const login = async (email: string, password: string) => {
+    // Demo mode - bypass authentication for demo users
+    if (email === 'demo@certificaglobal.mx' || email === 'demo') {
+      const demoUser: any = {
+        id: 'demo-user',
+        email: 'demo@certificaglobal.mx',
+        user_metadata: { name: 'Usuario Demo' }
+      };
+      
+      setUser(demoUser);
+      setSession({ user: demoUser } as any);
+      setIsLoading(false);
+      
+      // Set demo data for CV analysis and progress
+      setLastAnalysis({
+        strengths: ['Liderazgo de equipos', 'Gestión de proyectos', 'Comunicación efectiva'],
+        opportunities: ['Análisis financiero', 'Certificación en competencias digitales'],
+        recommendedStandard: { code: 'EC0301', title: 'Gestión de Proyectos' }
+      });
+      
+      setProgress({
+        'EC0301': { completedModules: ['modulo1'] },
+        'EC0366': { completedModules: [] }
+      });
+      
+      return { error: null };
+    }
+
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -102,6 +129,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const updateProgress = async (newProgress: UserProgress) => {
     if (!user) return;
     
+    // For demo user, just update in memory
+    if (user.id === 'demo-user') {
+      setProgress(newProgress);
+      return;
+    }
+    
     try {
       const { error } = await supabase
         .from('user_profiles')
@@ -121,6 +154,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const updateLastAnalysis = async (analysis: CVAnalysisResult) => {
     if (!user) return;
+    
+    // For demo user, just update in memory
+    if (user.id === 'demo-user') {
+      setLastAnalysis(analysis);
+      return;
+    }
     
     try {
       const { error } = await supabase

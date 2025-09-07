@@ -66,15 +66,15 @@ const HomePage: React.FC = () => {
             </div>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button
-                onClick={() => setShowFreeAnalysis(true)}
+              <Link
+                to="/analisis-cv"
                 className="px-8 py-4 bg-gradient-to-r from-primary to-accent text-white font-semibold rounded-lg hover:scale-105 transition-all text-lg shadow-lg"
               >
                 <BrainCircuit className="w-5 h-5 inline mr-2" />
                 Análisis IA GRATUITO
-              </button>
+              </Link>
               <Link
-                to="/onboarding"
+                to="/estandares"
                 className="px-8 py-4 border border-white/20 text-white font-semibold rounded-lg hover:bg-white/10 transition-colors text-lg"
               >
                 Ver Certificaciones
@@ -87,27 +87,27 @@ const HomePage: React.FC = () => {
                 <FileText className="w-8 h-8 text-primary mx-auto mb-3" />
                 <h3 className="text-white font-semibold mb-2">Guía de Competencias</h3>
                 <p className="text-white/80 text-sm mb-3">PDF gratuito con las 15 competencias más demandadas</p>
-                <button className="text-primary hover:text-primary/80 text-sm font-medium">
+                <Link to="/estandares" className="text-primary hover:text-primary/80 text-sm font-medium">
                   Descargar gratis
-                </button>
+                </Link>
               </div>
               
               <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 text-center hover:bg-white/20 transition-all cursor-pointer">
                 <Bot className="w-8 h-8 text-accent mx-auto mb-3" />
                 <h3 className="text-white font-semibold mb-2">ChatBot IA</h3>
                 <p className="text-white/80 text-sm mb-3">Consulta gratuita sobre tu plan de carrera</p>
-                <button className="text-accent hover:text-accent/80 text-sm font-medium">
+                <Link to="/dashboard" className="text-accent hover:text-accent/80 text-sm font-medium">
                   Chatear ahora
-                </button>
+                </Link>
               </div>
               
               <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 text-center hover:bg-white/20 transition-all cursor-pointer">
                 <Target className="w-8 h-8 text-yellow-400 mx-auto mb-3" />
                 <h3 className="text-white font-semibold mb-2">Test de Perfil</h3>
                 <p className="text-white/80 text-sm mb-3">Descubre qué certificación necesitas</p>
-                <button className="text-yellow-400 hover:text-yellow-400/80 text-sm font-medium">
+                <Link to="/analisis-cv" className="text-yellow-400 hover:text-yellow-400/80 text-sm font-medium">
                   Hacer test gratis
-                </button>
+                </Link>
               </div>
             </div>
           </div>
@@ -192,13 +192,13 @@ const HomePage: React.FC = () => {
           </div>
 
           <div className="text-center">
-            <button 
-              onClick={() => setShowFreeAnalysis(true)}
-              className="btn-gradient text-lg px-8 py-4 rounded-xl hover:scale-105 transition-all shadow-lg"
+            <Link 
+              to="/analisis-cv"
+              className="btn-gradient text-lg px-8 py-4 rounded-xl hover:scale-105 transition-all shadow-lg inline-flex items-center"
             >
               <Zap className="w-5 h-5 mr-2" />
               Probar IA Gratis Ahora
-            </button>
+            </Link>
           </div>
         </div>
       </section>

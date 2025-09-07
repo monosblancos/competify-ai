@@ -127,7 +127,7 @@ const LoginPage: React.FC = () => {
               <button
                 onClick={async () => {
                   setIsLoading(true);
-                  const { error } = await login('demo@certificaglobal.mx', 'demo123');
+                  const { error } = await login('demo@certificaglobal.mx', '');
                   if (error) {
                     console.error('Demo login error:', error);
                     alert(`Error de login: ${error.message}`);
