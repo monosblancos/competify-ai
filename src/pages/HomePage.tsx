@@ -55,19 +55,17 @@ const HomePage: React.FC = () => {
 
             {/* Video/Demo Section */}
             <div className="relative mb-12 max-w-4xl mx-auto">
-              <a 
-                href="https://www.youtube.com/watch?v=_mxyHhd1PZM" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="block aspect-video bg-gradient-to-r from-primary/20 to-accent/20 rounded-2xl border-2 border-white/20 flex items-center justify-center group cursor-pointer hover:scale-105 transition-transform"
-              >
-                <div className="text-center">
-                  <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform">
-                    <Play className="w-8 h-8 text-white ml-1" fill="currentColor" />
-                  </div>
-                  <p className="text-white font-medium">Ver demo del proceso de certificación</p>
-                </div>
-              </a>
+              <div className="aspect-video rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl">
+                <iframe
+                  src="https://www.youtube.com/embed/_mxyHhd1PZM"
+                  title="Demo del proceso de certificación"
+                  className="w-full h-full"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+              <p className="text-white/90 text-center mt-4 font-medium">Demo del proceso de certificación</p>
             </div>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
