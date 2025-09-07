@@ -577,14 +577,26 @@ const ChatbotExploracionPage: React.FC = () => {
             {offer.cta}
           </Button>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="flex-1">
-              <Mail className="h-4 w-4 mr-2" />
-              Email
-            </Button>
-            <Button variant="outline" size="sm" className="flex-1">
-              <Phone className="h-4 w-4 mr-2" />
-              WhatsApp
-            </Button>
+            <a 
+              href="mailto:administracion@certificaglobal.com"
+              className="flex-1"
+            >
+              <Button variant="outline" size="sm" className="w-full">
+                <Mail className="h-4 w-4 mr-2" />
+                Email
+              </Button>
+            </a>
+            <a 
+              href="https://wa.me/5527672486"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1"
+            >
+              <Button variant="outline" size="sm" className="w-full">
+                <Phone className="h-4 w-4 mr-2" />
+                WhatsApp
+              </Button>
+            </a>
           </div>
         </div>
       </CardContent>
@@ -623,40 +635,15 @@ const ChatbotExploracionPage: React.FC = () => {
       <ExitIntentModal />
       {/* Header */}
       <div className="bg-card/95 backdrop-blur-sm border-b border-border shadow-sm">
-        <div className="max-w-4xl mx-auto p-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
-              <Bot className="h-6 w-6 text-primary" />
-              Sistema de Orientación CONOCER
-            </h1>
-            <p className="text-muted-foreground text-sm">RAG + Base de Datos CONOCER (1845 estándares)</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={async () => {
-                try {
-                  toast({
-                    title: "Generando embeddings...",
-                    description: "Esto puede tomar varios minutos (primera vez)"
-                  });
-                  await ragChatbot.generateEmbeddings();
-                  toast({
-                    title: "¡Embeddings generados!",
-                    description: "El sistema RAG está ahora optimizado"
-                  });
-                } catch (error) {
-                  toast({
-                    title: "Error",
-                    description: "No se pudieron generar los embeddings",
-                    variant: "destructive"
-                  });
-                }
-              }}
-            >
-              Inicializar RAG
-            </Button>
+        <div className="max-w-4xl mx-auto p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
+                <Bot className="h-6 w-6 text-primary" />
+                Asistente de Certificación CONOCER
+              </h1>
+              <p className="text-muted-foreground text-sm">Tu guía inteligente para encontrar la certificación perfecta</p>
+            </div>
             <div className="text-right">
               <div className="text-foreground text-sm mb-1">Progreso</div>
               <div className="flex items-center gap-2">
@@ -806,14 +793,22 @@ const ChatbotExploracionPage: React.FC = () => {
             <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
               <span>Presiona Enter para enviar • Shift+Enter para nueva línea</span>
               <div className="flex items-center gap-4">
-                <Button variant="ghost" size="sm">
-                  <Mail className="h-4 w-4 mr-1" />
-                  Email
-                </Button>
-                <Button variant="ghost" size="sm">
-                  <Phone className="h-4 w-4 mr-1" />
-                  WhatsApp
-                </Button>
+                <a 
+                  href="mailto:administracion@certificaglobal.com"
+                  className="flex items-center gap-1 px-2 py-1 rounded-md hover:bg-muted transition-colors"
+                >
+                  <Mail className="h-4 w-4" />
+                  <span className="text-xs">Email</span>
+                </a>
+                <a 
+                  href="https://wa.me/5527672486"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 px-2 py-1 rounded-md hover:bg-green-500/10 text-green-600 transition-colors"
+                >
+                  <Phone className="h-4 w-4" />
+                  <span className="text-xs">WhatsApp</span>
+                </a>
               </div>
             </div>
           </CardContent>
