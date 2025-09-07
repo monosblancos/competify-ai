@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useStandardsSearch } from '@/hooks/useStandardsSearch';
 
 interface Message {
   id: string;
@@ -65,6 +66,7 @@ interface LeadMagnetOffer {
 
 const ChatbotExploracionPage: React.FC = () => {
   const { toast } = useToast();
+  const { searchByKeywords, searchStandards, getRandomStandards, isSearching } = useStandardsSearch();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -245,30 +247,27 @@ const ChatbotExploracionPage: React.FC = () => {
     }, 1500);
   };
 
-  // Search related standards
-  const searchRelatedStandards = async (query: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('standards')
-        .select('code, title, description, category')
-        .or(`title.ilike.%${query}%,description.ilike.%${query}%,category.ilike.%${query}%`)
-        .limit(3);
-      
-      if (!error && data) {
-        setRelatedStandards(data);
-        return data;
-      }
-    } catch (error) {
-      console.error('Error searching standards:', error);
-    }
-    return [];
+  // Convert database standard to StandardCard format
+  const convertToStandardCard = (dbStandard: any): StandardCard => {
+    return {
+      code: dbStandard.code,
+      title: dbStandard.title,
+      category: dbStandard.category || 'Competencia Profesional',
+      level: 'Nivel III' as const,
+      averageSalary: '$20,000 - $35,000 MXN',
+      demand: 'Alta' as const,
+      rating: 4.5,
+      tags: ['certificación', 'conocer', 'competencia'],
+      description: dbStandard.description || 'Estándar de competencia profesional reconocido nacionalmente.',
+      certifiedProfessionals: Math.floor(Math.random() * 10000) + 1000
+    };
   };
 
   const generateBotResponse = async (userInput: string): Promise<Message> => {
     const lowerInput = userInput.toLowerCase();
     
-    // Search for related standards
-    const standards = await searchRelatedStandards(userInput);
+    // Search for related standards using the new hook
+    let relatedDbStandards: any[] = [];
     
     // Lead magnet triggers (only show in conversation after significant interaction)
     if (messages.length > 5 && (lowerInput.includes('guía') || lowerInput.includes('ayuda') || lowerInput.includes('orientación'))) {
@@ -282,37 +281,46 @@ const ChatbotExploracionPage: React.FC = () => {
       };
     }
 
-    if (lowerInput.includes('tecnología') || lowerInput.includes('digital') || lowerInput.includes('ti') || lowerInput.includes('sistemas')) {
-      return {
-        id: Date.now().toString(),
-        type: 'bot',
-        content: '¡Excelente elección! El sector tecnológico tiene una demanda muy alta. Te recomiendo este estándar con gran proyección:',
-        timestamp: new Date(),
-        standard: featuredStandards[2],
-        suggestions: ['¿Qué otros estándares en tecnología hay?', 'Quiero ver el salario promedio', 'Me interesa certificarme']
-      };
+    if (lowerInput.includes('tecnología') || lowerInput.includes('digital') || lowerInput.includes('ti') || lowerInput.includes('sistemas') || lowerInput.includes('línea') || lowerInput.includes('online')) {
+      relatedDbStandards = await searchByKeywords(['tecnología', 'digital', 'línea', 'online', 'cursos']);
+      if (relatedDbStandards.length > 0) {
+        return {
+          id: Date.now().toString(),
+          type: 'bot',
+          content: '¡Excelente elección! El sector tecnológico tiene una demanda muy alta. Te recomiendo este estándar con gran proyección:',
+          timestamp: new Date(),
+          standard: convertToStandardCard(relatedDbStandards[0]),
+          suggestions: ['¿Qué otros estándares en tecnología hay?', 'Quiero ver el salario promedio', 'Me interesa certificarme']
+        };
+      }
     }
 
     if (lowerInput.includes('capacitación') || lowerInput.includes('enseñar') || lowerInput.includes('formación') || lowerInput.includes('educar')) {
-      return {
-        id: Date.now().toString(),
-        type: 'bot',
-        content: '¡Perfecto! La capacitación es un sector con alta demanda y excelentes oportunidades. Te muestro el estándar más popular:',
-        timestamp: new Date(),
-        standard: featuredStandards[0],
-        suggestions: ['¿Cuánto ganan los capacitadores?', 'Ver proceso de certificación', 'Mostrar estándares relacionados']
-      };
+      relatedDbStandards = await searchByKeywords(['capacitación', 'formación', 'cursos', 'educación']);
+      if (relatedDbStandards.length > 0) {
+        return {
+          id: Date.now().toString(),
+          type: 'bot',
+          content: '¡Perfecto! La capacitación es un sector con alta demanda y excelentes oportunidades. Te muestro el estándar más popular:',
+          timestamp: new Date(),
+          standard: convertToStandardCard(relatedDbStandards[0]),
+          suggestions: ['¿Cuánto ganan los capacitadores?', 'Ver proceso de certificación', 'Mostrar estándares relacionados']
+        };
+      }
     }
 
     if (lowerInput.includes('salario') || lowerInput.includes('sueldo') || lowerInput.includes('ganar') || lowerInput.includes('dinero')) {
-      return {
-        id: Date.now().toString(),
-        type: 'bot',
-        content: '¡Excelente pregunta! Los profesionales certificados pueden aumentar significativamente sus ingresos. Te muestro algunos estándares con alta remuneración:',
-        timestamp: new Date(),
-        standards: featuredStandards,
-        suggestions: ['¿Cuál me conviene más?', 'Quiero consultoría personalizada', 'Ver todos los estándares']
-      };
+      relatedDbStandards = await getRandomStandards(3);
+      if (relatedDbStandards.length > 0) {
+        return {
+          id: Date.now().toString(),
+          type: 'bot',
+          content: '¡Excelente pregunta! Los profesionales certificados pueden aumentar significativamente sus ingresos. Te muestro algunos estándares con alta remuneración:',
+          timestamp: new Date(),
+          standards: relatedDbStandards.map(convertToStandardCard),
+          suggestions: ['¿Cuál me conviene más?', 'Quiero consultoría personalizada', 'Ver todos los estándares']
+        };
+      }
     }
 
     if (messages.length > 5 && (lowerInput.includes('certificación') || lowerInput.includes('certificar') || lowerInput.includes('conocer'))) {
@@ -337,57 +345,55 @@ const ChatbotExploracionPage: React.FC = () => {
       };
     }
 
-    // Show related standards if found
-    if (standards.length > 0) {
+    // Search for standards based on user input as fallback
+    relatedDbStandards = await searchStandards(userInput);
+    if (relatedDbStandards.length > 0) {
       return {
         id: Date.now().toString(),
         type: 'bot',
-        content: `¡Excelente! Encontré ${standards.length} estándares CONOCER relacionados con tu consulta. Estos podrían ser perfectos para tu crecimiento profesional y aumento salarial:`,
+        content: `¡Excelente! Encontré ${relatedDbStandards.length} estándares CONOCER relacionados con tu consulta. Estos podrían ser perfectos para tu crecimiento profesional y aumento salarial:`,
         timestamp: new Date(),
-        standards: standards.slice(0, 3).map(s => ({
-          code: s.code,
-          title: s.title,
-          category: s.category || 'Competencia Profesional',
-          level: 'Nivel III' as const,
-          averageSalary: '$20,000 - $35,000 MXN',
-          demand: 'Alta' as const,
-          rating: 4.5,
-          tags: ['certificación', 'conocer', 'competencia'],
-          description: s.description || 'Estándar de competencia profesional reconocido nacionalmente.',
-          certifiedProfessionals: Math.floor(Math.random() * 10000) + 1000
-        })),
-        suggestions: standards.slice(0, 3).map(s => `Ver ${s.code}: ${s.title.substring(0, 30)}...`)
+        standards: relatedDbStandards.slice(0, 3).map(convertToStandardCard),
+        suggestions: relatedDbStandards.slice(0, 3).map(s => `Ver ${s.code}: ${s.title.substring(0, 30)}...`)
       };
     }
 
-    // Default responses with standard suggestions
-    const responses = [
-      {
-        content: '¡Genial! Basado en tu consulta, te recomiendo este estándar de competencia muy demandado:',
-        standard: featuredStandards[0]
-      },
-      {
-        content: 'Te entiendo perfectamente. Aquí tienes un estándar con excelente proyección salarial:',
-        standard: featuredStandards[1]
-      },
-      {
-        content: '¡Esa es una excelente pregunta! Te comparto este estándar con alta demanda laboral:',
-        standard: featuredStandards[2]
-      }
-    ];
+    // Default response - get a random standard from database
+    const randomStandards = await getRandomStandards(1);
+    if (randomStandards.length > 0) {
+      const responses = [
+        '¡Genial! Basado en tu consulta, te recomiendo este estándar de competencia muy demandado:',
+        'Te entiendo perfectamente. Aquí tienes un estándar con excelente proyección salarial:',
+        '¡Esa es una excelente pregunta! Te comparto este estándar con alta demanda laboral:'
+      ];
 
-    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-    
+      const randomContent = responses[Math.floor(Math.random() * responses.length)];
+      
+      return {
+        id: Date.now().toString(),
+        type: 'bot',
+        content: randomContent,
+        timestamp: new Date(),
+        standard: convertToStandardCard(randomStandards[0]),
+        suggestions: [
+          'Ver más estándares similares',
+          '¿Cuánto puedo ganar con esto?',
+          'Quiero certificarme',
+          'Consultoría personalizada'
+        ]
+      };
+    }
+
+    // Fallback response if no standards found
     return {
       id: Date.now().toString(),
       type: 'bot',
-      content: randomResponse.content,
+      content: 'Entiendo tu consulta. Para darte una recomendación más precisa, ¿podrías contarme más sobre tu experiencia laboral o el área en la que te gustaría especializarte?',
       timestamp: new Date(),
-      standard: randomResponse.standard,
       suggestions: [
-        'Ver más estándares similares',
-        '¿Cuánto puedo ganar con esto?',
-        'Quiero certificarme',
+        'Quiero trabajar en tecnología',
+        'Me interesa la capacitación',
+        'Busco aumentar mi salario',
         'Consultoría personalizada'
       ]
     };
