@@ -18,6 +18,7 @@ import OpportunitiesPage from './pages/OpportunitiesPage';
 import NotFoundPage from './pages/NotFoundPage';
 import DiagnosticoPage from './pages/DiagnosticoPage';
 import ProgramasPage from './pages/ProgramasPage';
+import ChatbotExploracionPage from './pages/ChatbotExploracionPage';
 
 const App: React.FC = () => {
   const location = useLocation();
@@ -35,6 +36,7 @@ const App: React.FC = () => {
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/onboarding" element={<OnboardingPage />} />
             <Route path="/diagnostico" element={<DiagnosticoPage />} />
+            <Route path="/diagnostico/chatbot" element={<ChatbotExploracionPage />} />
             <Route path="/programas" element={<ProgramasPage />} />
             
             <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
