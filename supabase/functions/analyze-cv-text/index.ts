@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { cvText, standards } = await req.json()
+    const { cvText, experiences, objectives, fullName, educationLevel, standards } = await req.json()
     
     if (!cvText || !cvText.trim()) {
       throw new Error('CV text is required')
@@ -22,20 +22,35 @@ serve(async (req) => {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
 
     const prompt = `
-      Actúa como un experto en reclutamiento y en los estándares CONOCER. Analiza el siguiente CV.
-      1. Identifica 3-5 fortalezas clave (habilidades blandas o duras).
-      2. Identifica 2-3 áreas de oportunidad o habilidades que podrían mejorarse.
-      3. De la siguiente lista de estándares, recomienda el MÁS relevante para el perfil: ${JSON.stringify(standards)}.
+      Eres un experto en desarrollo profesional y análisis de competencias laborales. Analiza el perfil completo de este profesional mexicano considerando TODA su información.
+
+      INFORMACIÓN DEL PROFESIONAL:
+      Nombre: ${fullName || 'No proporcionado'}
+      Nivel Educativo: ${educationLevel || 'No proporcionado'}
       
-      Devuelve la respuesta ÚNICAMENTE en formato JSON con la siguiente estructura:
+      TEXTO DEL CV:
+      ---
+      ${cvText}
+      ---
+
+      EXPERIENCIA LABORAL ESTRUCTURADA:
+      ---
+      ${experiences && experiences.length > 0 ? JSON.stringify(experiences, null, 2) : 'No se proporcionó experiencia estructurada'}
+      ---
+
+      OBJETIVOS PROFESIONALES:
+      ---
+      ${objectives || 'No se proporcionaron objetivos específicos'}
+      ---
+
+      ESTÁNDARES DISPONIBLES: ${JSON.stringify(standards?.slice(0, 20))}
+      
+      Devuelve la respuesta ÚNICAMENTE en formato JSON:
       {
-        "strengths": ["Fortaleza 1", "Fortaleza 2"],
-        "opportunities": ["Oportunidad 1", "Oportunidad 2"], 
+        "strengths": ["Fortaleza 1", "Fortaleza 2", "Fortaleza 3", "Fortaleza 4"],
+        "opportunities": ["Oportunidad 1", "Oportunidad 2", "Oportunidad 3"], 
         "recommendedStandard": { "code": "ECXXXX", "title": "Título del estándar" }
       }
-      
-      CV a analizar:
-      ${cvText}
     `
 
     console.log('Analyzing CV text with Gemini...')

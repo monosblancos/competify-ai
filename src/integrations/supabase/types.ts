@@ -83,22 +83,43 @@ export type Database = {
       user_profiles: {
         Row: {
           created_at: string | null
+          cv_url: string | null
+          education_level: string | null
+          email: string | null
+          experiences: Json | null
+          full_name: string | null
           id: string
           last_analysis_result: Json | null
+          objectives: string | null
+          phone: string | null
           progress: Json | null
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
+          cv_url?: string | null
+          education_level?: string | null
+          email?: string | null
+          experiences?: Json | null
+          full_name?: string | null
           id: string
           last_analysis_result?: Json | null
+          objectives?: string | null
+          phone?: string | null
           progress?: Json | null
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
+          cv_url?: string | null
+          education_level?: string | null
+          email?: string | null
+          experiences?: Json | null
+          full_name?: string | null
           id?: string
           last_analysis_result?: Json | null
+          objectives?: string | null
+          phone?: string | null
           progress?: Json | null
           updated_at?: string | null
         }
