@@ -495,7 +495,7 @@ const HomePage: React.FC = () => {
                 </div>
                 <div className="flex items-center">
                   <Mail className="w-4 h-4 mr-2" />
-                  <span>contacto@certificaglobal.mx</span>
+                  <span>administracion@certificaglobal.com</span>
                 </div>
               </div>
             </div>
