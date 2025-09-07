@@ -227,6 +227,15 @@ export type Database = {
           title: string
         }[]
       }
+      search_standards_by_text: {
+        Args: { match_count?: number; search_query: string }
+        Returns: {
+          category: string
+          code: string
+          description: string
+          title: string
+        }[]
+      }
       sparsevec_out: {
         Args: { "": unknown }
         Returns: unknown

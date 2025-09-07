@@ -73,21 +73,51 @@ serve(async (req) => {
     const embeddingData = await embeddingResponse.json();
     const queryEmbedding = embeddingData.data[0].embedding;
 
-    // Step 2: Search for similar standards using the function
-    console.log('Searching for similar standards...');
-    const { data: similarStandards, error: searchError } = await supabaseClient
-      .rpc('search_standards_by_similarity', {
-        query_embedding: queryEmbedding,
-        match_threshold: 0.5,
-        match_count: 8
-      });
+    // Step 2: Search for similar standards using vector similarity
+    console.log('Searching for similar standards with embeddings...');
+    let similarStandards: any[] = [];
+    
+    try {
+      const { data: vectorResults, error: searchError } = await supabaseClient
+        .rpc('search_standards_by_similarity', {
+          query_embedding: queryEmbedding,
+          match_threshold: 0.5,
+          match_count: 8
+        });
 
-    if (searchError) {
-      console.error('Search error:', searchError);
-      throw searchError;
+      if (searchError) {
+        console.error('Vector search error:', searchError);
+      } else {
+        similarStandards = vectorResults || [];
+        console.log(`Found ${similarStandards.length} standards via vector search`);
+      }
+    } catch (error) {
+      console.error('Vector search failed:', error);
     }
 
-    console.log(`Found ${similarStandards?.length || 0} similar standards`);
+    // Step 2.5: Fallback to text search if vector search fails or returns no results
+    if (similarStandards.length === 0) {
+      console.log('Falling back to text search...');
+      try {
+        const { data: textResults, error: textError } = await supabaseClient
+          .rpc('search_standards_by_text', {
+            search_query: message,
+            match_count: 5
+          });
+
+        if (textError) {
+          console.error('Text search error:', textError);
+        } else {
+          similarStandards = (textResults || []).map((standard: any) => ({
+            ...standard,
+            similarity: 0.7 // Default similarity for text matches
+          }));
+          console.log(`Found ${similarStandards.length} standards via text search`);
+        }
+      } catch (error) {
+        console.error('Text search failed:', error);
+      }
+    }
 
     // Check if we have any standards with embeddings
     if (!similarStandards || similarStandards.length === 0) {
@@ -132,7 +162,7 @@ serve(async (req) => {
     // Step 4: Build context from similar standards
     const contextText = similarStandards && similarStandards.length > 0
       ? similarStandards.map(standard => 
-          `**${standard.code}**: ${standard.title}\n*Categoría: ${standard.category}*\n${standard.description}\n---`
+          `**[${standard.code}]**: ${standard.title}\n*Categoría: ${standard.category}*\n${standard.description}\n---`
         ).join('\n')
       : 'No se encontraron estándares relevantes en la base de datos.';
 
@@ -143,13 +173,16 @@ serve(async (req) => {
       .join('\n');
 
     // Step 6: Create augmented prompt
-    const augmentedPrompt = `Actúa como un asesor experto en competencias laborales de Certifica Global. Tu conocimiento se limita ESTRICTAMENTE a la información de contexto proporcionada. NUNCA inventes información.
+    const augmentedPrompt = `Actúa como un asesor experto en competencias laborales de Certifica Global. Tu conocimiento se limita ESTRICTAMENTE a la información de contexto proporcionada.
 
 **INSTRUCCIONES CRÍTICAS:**
-- Solo usa información de los estándares proporcionados
-- Si la respuesta no está en el contexto, di "No tengo información suficiente en mi base de datos"
-- Siempre cita los códigos y nombres exactos de los estándares
+- Solo usa información de los estándares proporcionados en el contexto
+- Si no encuentras información relevante, responde: "No encontré información sobre eso en mi base de conocimiento de Certifica Global"
+- SIEMPRE cita los códigos de estándares usando el formato [CÓDIGO] (ej: [EC0076], [EC0301])
 - Proporciona información práctica sobre certificaciones y competencias
+- Para consultas generales sobre certificación, menciona nuestros datos de contacto:
+  * Email: administracion@certificaglobal.com
+  * WhatsApp: 5527672486
 
 **CONTEXTO (Estándares de Competencia Relevantes):**
 ${contextText}
