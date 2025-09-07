@@ -318,32 +318,52 @@ const Header: React.FC = () => {
                 badge="Másters"
                 analytics="nav_programas_click"
               >
-                <div className="p-6 w-[500px]">
-                  <div className="mb-3 text-xs font-semibold uppercase text-primary">
-                    Formación aplicada con IA
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    {[
-                      { name: "Máster IA", desc: "Domina la Inteligencia Artificial aplicada" },
-                      { name: "Máster Marketing Digital", desc: "Estrategias digitales avanzadas" },
-                      { name: "Máster Funnel de Ventas", desc: "Optimiza tus conversiones" },
-                      { name: "Máster SEO", desc: "Posicionamiento web profesional" },
-                      { name: "Máster SEM", desc: "Publicidad digital rentable" },
-                      { name: "Máster Data", desc: "Análisis de datos estratégicos" }
-                    ].map((program) => (
-                      <Link
-                        key={program.name}
-                        to="/programas"
-                        className="p-3 rounded-lg border border-border hover:bg-muted"
-                        data-analytics={`nav_programa_${program.name.toLowerCase().replace(/\s+/g, '_')}`}
-                      >
-                        <div className="text-sm font-semibold">{program.name}</div>
-                        <div className="text-xs text-muted-foreground mt-1">{program.desc}</div>
-                        <div className="text-xs text-primary font-medium mt-2">Ver programa →</div>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
+                 <div className="p-6 w-[600px]">
+                   <div className="mb-4">
+                     <div className="text-xs font-semibold uppercase text-primary mb-3">
+                       Formación aplicada con IA · Precios en MXN · Financiamiento disponible
+                     </div>
+                   <div className="grid grid-cols-2 gap-3">
+                     {[
+                       { name: "Máster IA", desc: "Domina la Inteligencia Artificial aplicada", price: "$49,900 MXN", originalPrice: "$69,900" },
+                       { name: "Máster Marketing Digital", desc: "Estrategias digitales avanzadas", price: "$39,900 MXN", originalPrice: "$55,900" },
+                       { name: "Máster Funnel de Ventas", desc: "Optimiza tus conversiones", price: "$33,900 MXN", originalPrice: "$47,900" },
+                       { name: "Máster SEO", desc: "Posicionamiento web profesional", price: "$29,900 MXN", originalPrice: "$43,900" },
+                       { name: "Máster SEM", desc: "Publicidad digital rentable", price: "$25,900 MXN", originalPrice: "$37,900" },
+                       { name: "Máster Data", desc: "Análisis de datos estratégicos", price: "$43,900 MXN", originalPrice: "$59,900" }
+                     ].map((program) => (
+                       <Link
+                         key={program.name}
+                         to={`/programas/${program.name.toLowerCase().replace(/\s+/g, '-')}`}
+                         className="p-3 rounded-lg border border-border hover:bg-muted group"
+                         data-analytics={`nav_programa_${program.name.toLowerCase().replace(/\s+/g, '_')}`}
+                       >
+                         <div className="text-sm font-semibold">{program.name}</div>
+                         <div className="text-xs text-muted-foreground mt-1">{program.desc}</div>
+                         <div className="text-xs text-primary font-medium mt-2 flex items-center justify-between">
+                           <span>{program.price}</span>
+                           <span className="group-hover:underline">Ver programa →</span>
+                         </div>
+                       </Link>
+                     ))}
+                     )}
+                   </div>
+                   <div className="mt-4 p-3 bg-primary/5 rounded-lg">
+                     <div className="flex items-center justify-between">
+                       <div>
+                         <div className="text-sm font-semibold text-primary">Explora todos los programas</div>
+                         <div className="text-xs text-muted-foreground">Másters intensivos con certificación</div>
+                       </div>
+                       <Link
+                         to="/programas"
+                         className="text-xs bg-primary text-primary-foreground px-3 py-1 rounded-md hover:shadow-sm transition-all"
+                         data-analytics="nav_programas_ver_todos"
+                       >
+                         Ver Todo →
+                       </Link>
+                     </div>
+                   </div>
+                 </div>
               </MegaMenu>
 
               {/* Other Menu Items */}

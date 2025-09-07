@@ -27,8 +27,9 @@ const ProgramasPage: React.FC = () => {
       students: '2,450+',
       level: 'Avanzado',
       topics: ['Machine Learning', 'Deep Learning', 'NLP', 'Computer Vision', 'IA Ética'],
-      price: '€2,497',
-      originalPrice: '€3,497',
+      price: '$49,900',
+      originalPrice: '$69,900',
+      priceDisplay: '$49,900 MXN',
       featured: true
     },
     {
@@ -40,8 +41,9 @@ const ProgramasPage: React.FC = () => {
       students: '1,890+',
       level: 'Intermedio-Avanzado',
       topics: ['SEM/SEO', 'Social Media', 'Email Marketing', 'Analytics', 'Growth Hacking'],
-      price: '€1,997',
-      originalPrice: '€2,797'
+      price: '$39,900',
+      originalPrice: '$55,900',
+      priceDisplay: '$39,900 MXN'
     },
     {
       id: 'funnel',
@@ -52,8 +54,9 @@ const ProgramasPage: React.FC = () => {
       students: '1,234+',
       level: 'Intermedio',
       topics: ['Copywriting', 'Landing Pages', 'A/B Testing', 'CRO', 'Automatización'],
-      price: '€1,697',
-      originalPrice: '€2,397'
+      price: '$33,900',
+      originalPrice: '$47,900',
+      priceDisplay: '$33,900 MXN'
     },
     {
       id: 'seo',
@@ -64,8 +67,9 @@ const ProgramasPage: React.FC = () => {
       students: '3,120+',
       level: 'Intermedio-Avanzado',
       topics: ['SEO Técnico', 'Link Building', 'Contenido SEO', 'Local SEO', 'SEO Internacional'],
-      price: '€1,497',
-      originalPrice: '€2,197'
+      price: '$29,900',
+      originalPrice: '$43,900',
+      priceDisplay: '$29,900 MXN'
     },
     {
       id: 'sem',
@@ -76,8 +80,9 @@ const ProgramasPage: React.FC = () => {
       students: '987+',
       level: 'Intermedio',
       topics: ['Google Ads', 'Facebook Ads', 'Programática', 'Retargeting', 'Attribution'],
-      price: '€1,297',
-      originalPrice: '€1,897'
+      price: '$25,900',
+      originalPrice: '$37,900',
+      priceDisplay: '$25,900 MXN'
     },
     {
       id: 'data',
@@ -88,8 +93,9 @@ const ProgramasPage: React.FC = () => {
       students: '756+',
       level: 'Avanzado',
       topics: ['Python/R', 'SQL', 'Tableau/Power BI', 'Machine Learning', 'Big Data'],
-      price: '€2,197',
-      originalPrice: '€2,997'
+      price: '$43,900',
+      originalPrice: '$59,900',
+      priceDisplay: '$43,900 MXN'
     }
   ];
 
@@ -191,23 +197,26 @@ const ProgramasPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl font-bold text-foreground">
-                      {program.price}
-                    </span>
-                    <span className="text-sm text-muted-foreground line-through">
-                      {program.originalPrice}
-                    </span>
-                  </div>
-                  <Button 
-                    className={program.featured ? 'bg-gradient-primary text-white' : ''} 
-                    variant={program.featured ? 'default' : 'outline'}
-                  >
-                    Ver Programa
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </div>
+                 <div className="flex items-center justify-between">
+                   <div className="flex items-center gap-3">
+                     <span className="text-2xl font-bold text-foreground">
+                       {program.priceDisplay}
+                     </span>
+                     <span className="text-sm text-muted-foreground line-through">
+                       {program.originalPrice} MXN
+                     </span>
+                   </div>
+                   <Button 
+                     asChild
+                     className={program.featured ? 'bg-gradient-primary text-white' : ''} 
+                     variant={program.featured ? 'default' : 'outline'}
+                   >
+                     <Link to={`/programas/${program.id}/checkout`}>
+                       Inscríbete Ahora
+                       <ArrowRight className="ml-2 h-4 w-4" />
+                     </Link>
+                   </Button>
+                 </div>
               </Card>
             ))}
           </div>
