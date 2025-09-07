@@ -122,10 +122,30 @@ const LoginPage: React.FC = () => {
               <p className="text-sm text-muted-foreground mb-4">
                 Demo - Puedes usar cualquier nombre y email
               </p>
+              
+              {/* Demo Login Button */}
+              <button
+                onClick={async () => {
+                  setIsLoading(true);
+                  const { error } = await login('demo@certificaglobal.mx', 'demo123');
+                  if (error) {
+                    console.error('Demo login error:', error);
+                    alert(`Error de login: ${error.message}`);
+                    setIsLoading(false);
+                  } else {
+                    navigate('/dashboard');
+                  }
+                }}
+                disabled={isLoading}
+                className="w-full mb-4 px-4 py-3 bg-gradient-to-r from-accent to-primary text-white font-semibold rounded-lg hover:opacity-90 transition-all disabled:opacity-50"
+              >
+                🚀 Acceso Demo Rápido
+              </button>
+              
               <div className="bg-accent/10 p-4 rounded-lg">
                 <p className="text-sm text-accent-foreground">
                   <strong>Tip:</strong> Esta es una aplicación demo. Puedes usar cualquier 
-                  nombre y correo para acceder.
+                  nombre y correo para acceder o hacer clic en "Acceso Demo Rápido".
                 </p>
               </div>
             </div>
