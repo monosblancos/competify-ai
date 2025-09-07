@@ -7,57 +7,51 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
+  console.log('Function called with method:', req.method)
+  
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    const { cvText, experiences, objectives, fullName, educationLevel, standards } = await req.json()
+    console.log('Starting CV analysis...')
+    
+    const requestBody = await req.json()
+    console.log('Request received with keys:', Object.keys(requestBody))
+    
+    const { cvText, experiences, objectives, fullName, educationLevel, standards } = requestBody
     
     if (!cvText || !cvText.trim()) {
+      console.error('CV text is missing or empty')
       throw new Error('CV text is required')
     }
 
+    console.log('CV text length:', cvText.length)
+
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY')
+    console.log('OpenAI API Key available:', !!openAIApiKey)
+    
     if (!openAIApiKey) {
+      console.error('OpenAI API key not found in environment variables')
       throw new Error('OpenAI API key not configured')
     }
 
-    const prompt = `
-      Eres un experto en desarrollo profesional y análisis de competencias laborales. Analiza el perfil completo de este profesional mexicano considerando TODA su información.
+    // Simplified prompt to avoid issues
+    const prompt = `Analiza este CV y proporciona un análisis en formato JSON.
 
-      INFORMACIÓN DEL PROFESIONAL:
-      Nombre: ${fullName || 'No proporcionado'}
-      Nivel Educativo: ${educationLevel || 'No proporcionado'}
-      
-      TEXTO DEL CV:
-      ---
-      ${cvText}
-      ---
+CV: ${cvText.substring(0, 3000)}
+Experiencias: ${JSON.stringify(experiences || [])}
+Objetivos: ${objectives || 'No especificados'}
 
-      EXPERIENCIA LABORAL ESTRUCTURADA:
-      ---
-      ${experiences && experiences.length > 0 ? JSON.stringify(experiences, null, 2) : 'No se proporcionó experiencia estructurada'}
-      ---
+Responde solo con JSON válido:
+{
+  "strengths": ["Experiencia en X", "Conocimientos en Y"],
+  "opportunities": ["Mejorar en A", "Certificarse en B"], 
+  "recommendedStandard": { "code": "EC0301", "title": "Estándar recomendado" }
+}`
 
-      OBJETIVOS PROFESIONALES:
-      ---
-      ${objectives || 'No se proporcionaron objetivos específicos'}
-      ---
+    console.log('Calling OpenAI API...')
 
-      ESTÁNDARES DISPONIBLES: ${JSON.stringify(standards?.slice(0, 20))}
-      
-      Devuelve la respuesta ÚNICAMENTE en formato JSON:
-      {
-        "strengths": ["Fortaleza 1", "Fortaleza 2", "Fortaleza 3", "Fortaleza 4"],
-        "opportunities": ["Oportunidad 1", "Oportunidad 2", "Oportunidad 3"], 
-        "recommendedStandard": { "code": "ECXXXX", "title": "Título del estándar" }
-      }
-    `
-
-    console.log('Analyzing CV text with OpenAI...')
-
-    // Call OpenAI API
     const openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -65,48 +59,68 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4.1-2025-04-14',
+        model: 'gpt-4o-mini', // Using a more stable model
         messages: [
           {
             role: 'system',
-            content: 'Eres un experto consultor en competencias laborales y análisis de CV. Proporciona análisis detallados y recomendaciones específicas basadas en estándares de competencia CONOCER.'
+            content: 'Eres un experto en análisis de CV. Responde siempre en formato JSON válido.'
           },
           {
             role: 'user',
             content: prompt
           }
         ],
-        max_completion_tokens: 1000,
-        response_format: { type: "json_object" }
+        max_tokens: 800,
+        temperature: 0.3
       }),
     })
+
+    console.log('OpenAI response status:', openAIResponse.status)
 
     if (!openAIResponse.ok) {
       const errorText = await openAIResponse.text()
       console.error('OpenAI API error:', errorText)
-      throw new Error(`OpenAI API error: ${openAIResponse.status}`)
+      throw new Error(`OpenAI API error: ${openAIResponse.status} - ${errorText}`)
     }
 
     const openAIData = await openAIResponse.json()
+    console.log('OpenAI data received')
+    
     const text = openAIData.choices[0].message.content
+    console.log('Response text length:', text?.length)
     
-    console.log('OpenAI response:', text)
-    
-    // Parse the JSON response
+    // Parse the JSON response with better error handling
     let parsedResult
     try {
-      parsedResult = JSON.parse(text)
+      // Clean the response
+      const cleanText = text.replace(/```json\n?|```\n?/g, '').trim()
+      parsedResult = JSON.parse(cleanText)
+      console.log('Successfully parsed JSON response')
     } catch (parseError) {
-      console.error('Error parsing OpenAI JSON response:', parseError)
-      // Fallback analysis if JSON parsing fails
+      console.error('Error parsing JSON response:', parseError)
+      console.error('Raw response:', text)
+      
+      // Provide a safe fallback
       parsedResult = {
-        strengths: ['Experiencia profesional relevante', 'Capacidad de adaptación', 'Formación académica sólida'],
-        opportunities: ['Certificación en competencias específicas', 'Desarrollo de habilidades digitales', 'Especialización sectorial'],
-        recommendedStandard: standards?.[0] ? { code: standards[0].code, title: standards[0].title } : { code: 'EC0301', title: 'Diseño de cursos de formación' }
+        strengths: [
+          'Experiencia profesional demostrada',
+          'Capacidad de adaptación',
+          'Formación académica sólida',
+          'Habilidades técnicas'
+        ],
+        opportunities: [
+          'Certificación en competencias laborales',
+          'Desarrollo de habilidades digitales',
+          'Especialización en área específica'
+        ],
+        recommendedStandard: {
+          code: standards?.[0]?.code || 'EC0301',
+          title: standards?.[0]?.title || 'Diseño de cursos de formación'
+        }
       }
     }
 
-    console.log('Parsed analysis result:', parsedResult)
+    console.log('Analysis completed successfully')
 
     return new Response(
       JSON.stringify(parsedResult),
@@ -115,10 +129,15 @@ serve(async (req) => {
         status: 200,
       },
     )
+    
   } catch (error) {
-    console.error('Error analyzing CV text:', error)
+    console.error('Function error:', error)
+    
     return new Response(
-      JSON.stringify({ error: 'Error analyzing CV text: ' + error.message }),
+      JSON.stringify({ 
+        error: 'Error analyzing CV text: ' + error.message,
+        details: error.toString()
+      }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,
