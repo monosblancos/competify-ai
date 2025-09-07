@@ -93,6 +93,7 @@ const ChatbotExploracionPage: React.FC = () => {
   });
   const [showExitModal, setShowExitModal] = useState(false);
   const [relatedStandards, setRelatedStandards] = useState<any[]>([]);
+  const [isInitializing, setIsInitializing] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -380,6 +381,26 @@ const ChatbotExploracionPage: React.FC = () => {
     handleSendMessage(suggestion);
   };
 
+  const handleInitializeRAG = async () => {
+    setIsInitializing(true);
+    try {
+      await ragChatbot.generateEmbeddings();
+      toast({
+        title: "¡Inicialización completa!",
+        description: "El sistema de recomendaciones inteligentes ya está listo para funcionar",
+      });
+    } catch (error) {
+      console.error('Error initializing RAG:', error);
+      toast({
+        title: "Error en inicialización",
+        description: "Hubo un problema al configurar el sistema. Por favor intenta nuevamente.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsInitializing(false);
+    }
+  };
+
   const handleEmailCapture = () => {
     if (!sessionData.email) {
       toast({
@@ -642,6 +663,26 @@ const ChatbotExploracionPage: React.FC = () => {
 
       {/* Chat Container */}
       <div className="max-w-4xl mx-auto p-4 h-[calc(100vh-120px)] flex flex-col">
+        {/* Initialize RAG Button */}
+        <div className="mb-4 p-4 bg-accent/50 rounded-lg border">
+          <div className="flex items-center gap-3">
+            <Button 
+              onClick={handleInitializeRAG}
+              disabled={isInitializing}
+              variant="default"
+              size="sm"
+            >
+              {isInitializing ? 'Inicializando Sistema...' : 'Inicializar RAG'}
+            </Button>
+            <p className="text-sm text-muted-foreground">
+              {isInitializing 
+                ? 'Generando índice de conocimientos para búsquedas inteligentes...'
+                : 'Configura la base de conocimientos para recomendaciones inteligentes'
+              }
+            </p>
+          </div>
+        </div>
+
         {/* Messages */}
         <div className="flex-1 overflow-y-auto space-y-4 mb-4">
           {messages.map((message) => (

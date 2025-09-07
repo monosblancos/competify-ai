@@ -60,13 +60,14 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: 'text-embedding-3-small',
-        input: message,
-        dimensions: 1536
+        input: message
       }),
     });
 
     if (!embeddingResponse.ok) {
-      throw new Error('Failed to generate embedding');
+      const errorText = await embeddingResponse.text();
+      console.error('OpenAI Embedding Error:', errorText);
+      throw new Error(`Failed to generate embedding: ${errorText}`);
     }
 
     const embeddingData = await embeddingResponse.json();
@@ -77,7 +78,7 @@ serve(async (req) => {
     const { data: similarStandards, error: searchError } = await supabaseClient
       .rpc('search_standards_by_similarity', {
         query_embedding: queryEmbedding,
-        match_threshold: 0.6,
+        match_threshold: 0.5,
         match_count: 8
       });
 
@@ -87,6 +88,31 @@ serve(async (req) => {
     }
 
     console.log(`Found ${similarStandards?.length || 0} similar standards`);
+
+    // Check if we have any standards with embeddings
+    if (!similarStandards || similarStandards.length === 0) {
+      const { data: embeddingCheck } = await supabaseClient
+        .from('standards')
+        .select('code')
+        .not('embedding', 'is', null)
+        .limit(1);
+      
+      if (!embeddingCheck || embeddingCheck.length === 0) {
+        console.warn('No embeddings found in standards table');
+        return new Response(JSON.stringify({
+          message: 'El sistema de recomendaciones inteligentes aún se está inicializando. Por favor, utiliza el botón "Inicializar RAG" para configurar la base de conocimientos, o realiza una búsqueda manual en nuestra lista de estándares.',
+          sessionId: sessionId || crypto.randomUUID(),
+          relevantStandards: [],
+          context: {
+            standardsFound: 0,
+            searchQuery: message,
+            systemStatus: 'embeddings_not_initialized'
+          }
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
 
     // Step 3: Get or create chat session
     let chatSession: ChatSession;
