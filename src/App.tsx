@@ -33,12 +33,12 @@ const App: React.FC = () => {
             <Route path="/onboarding" element={<OnboardingPage />} />
             
             <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-            <Route path="/analisis-cv" element={<ProtectedRoute><AnalisisCVPage /></ProtectedRoute>} />
+            <Route path="/analisis-cv" element={<AnalisisCVPage />} />
             <Route path="/analisis-cv-texto" element={<ProtectedRoute><CVTextAnalysisPage /></ProtectedRoute>} />
-            <Route path="/estandares" element={<ProtectedRoute><StandardsPage /></ProtectedRoute>} />
-            <Route path="/estandares/:standardCode" element={<ProtectedRoute><StandardDetailPage /></ProtectedRoute>} />
+            <Route path="/estandares" element={<StandardsPage />} />
+            <Route path="/estandares/:standardCode" element={<StandardDetailPage />} />
             <Route path="/mis-cursos" element={<ProtectedRoute><MyCoursesPage /></ProtectedRoute>} />
-            <Route path="/oportunidades" element={<ProtectedRoute><OpportunitiesPage /></ProtectedRoute>} />
+            <Route path="/oportunidades" element={<OpportunitiesPage />} />
 
             <Route path="*" element={<NotFoundPage />} />
           </Routes>

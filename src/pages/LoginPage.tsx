@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -8,21 +8,36 @@ const LoginPage: React.FC = () => {
     password: ''
   });
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, user, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (user && !authLoading) {
+      console.log('User already logged in, redirecting to dashboard...');
+      navigate('/dashboard', { replace: true });
+    }
+  }, [user, authLoading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    const { error } = await login(formData.email, formData.password);
-    
-    if (error) {
-      console.error('Login error:', error);
-      alert(`Error de login: ${error.message}`);
+    try {
+      const { error } = await login(formData.email, formData.password);
+      
+      if (error) {
+        console.error('Login error:', error);
+        alert(`Error de login: ${error.message}`);
+      } else {
+        // Don't navigate immediately - let the auth state change handle it
+        console.log('Login successful, waiting for auth state change...');
+      }
+    } catch (err) {
+      console.error('Login error:', err);
+      alert('Error inesperado durante el login');
+    } finally {
       setIsLoading(false);
-    } else {
-      navigate('/dashboard');
     }
   };
 
@@ -127,13 +142,19 @@ const LoginPage: React.FC = () => {
               <button
                 onClick={async () => {
                   setIsLoading(true);
-                  const { error } = await login('demo@certificaglobal.mx', '');
-                  if (error) {
-                    console.error('Demo login error:', error);
-                    alert(`Error de login: ${error.message}`);
+                  try {
+                    const { error } = await login('demo@certificaglobal.mx', '');
+                    if (error) {
+                      console.error('Demo login error:', error);
+                      alert(`Error de login: ${error.message}`);
+                    } else {
+                      console.log('Demo login successful, waiting for auth state change...');
+                    }
+                  } catch (err) {
+                    console.error('Demo login error:', err);
+                    alert('Error inesperado durante el login demo');
+                  } finally {
                     setIsLoading(false);
-                  } else {
-                    navigate('/dashboard');
                   }
                 }}
                 disabled={isLoading}

@@ -19,16 +19,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     let mounted = true;
-
+    
     // Set up auth state listener FIRST (synchronous only!)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (!mounted) return;
         
+        console.log('Auth state change:', event, !!session?.user);
+        
         // Only synchronous state updates here
         setSession(session);
         setUser(session?.user ?? null);
-        setIsLoading(false); // Important: set loading false on any auth change
         
         // Defer any Supabase calls to avoid deadlock
         if (session?.user) {
@@ -42,6 +43,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setLastAnalysis(null);
           setProgress({});
         }
+        
+        // Set loading to false ONLY after we have processed the auth state
+        setIsLoading(false);
       }
     );
 
@@ -49,9 +53,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!mounted) return;
       
+      console.log('Initial session check:', !!session?.user);
+      
       setSession(session);
       setUser(session?.user ?? null);
-      setIsLoading(false);
       
       if (session?.user) {
         setTimeout(() => {
@@ -59,6 +64,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             fetchUserProfile(session.user.id);
           }
         }, 0);
+      }
+      
+      // Set loading to false after initial session check
+      setIsLoading(false);
+    }).catch(() => {
+      if (mounted) {
+        setIsLoading(false);
       }
     });
 
