@@ -199,6 +199,13 @@ const Header: React.FC = () => {
                       >
                         Mis Cursos
                       </Link>
+                      <Link
+                        to="/mi-biblioteca"
+                        className="block px-4 py-2 text-sm hover:bg-muted"
+                        data-analytics="nav_user_library"
+                      >
+                        Mi Biblioteca
+                      </Link>
                       <hr className="my-2 border-border" />
                       <button
                         onClick={handleLogout}
@@ -364,17 +371,59 @@ const Header: React.FC = () => {
                 Empresas
               </NavLink>
 
-              <NavLink
-                to="/recursos"
-                className={({ isActive }) =>
-                  `text-sm hover:text-foreground transition-colors ${
-                    isActive ? 'text-primary font-medium' : 'text-muted-foreground'
-                  }`
-                }
-                data-analytics="nav_recursos_click"
+              {/* Recursos */}
+              <MegaMenu
+                trigger="Recursos"
+                isActive={activeMenu === "recursos"}
+                onToggle={() => setActiveMenu(activeMenu === "recursos" ? null : "recursos")}
+                badge="MXN"
+                analytics="nav_recursos_click"
               >
-                Recursos
-              </NavLink>
+                <div className="p-6 w-[600px]">
+                  <div className="mb-4">
+                    <div className="text-xs font-semibold uppercase text-primary mb-3">
+                      Recursos prácticos · Precios en MXN · Acceso de por vida
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
+                      {[
+                        { type: "ebook", title: "Ebooks & Guías", desc: "Recursos descargables", price: "Desde $149", icon: "📚" },
+                        { type: "plantilla", title: "Plantillas", desc: "Formatos listos CONOCER", price: "Desde $299", icon: "📋" },
+                        { type: "curso", title: "Cursos Express", desc: "Micro-learning 2-6h", price: "Desde $990", icon: "🎥" },
+                        { type: "masterclass", title: "Masterclasses", desc: "Sesiones en vivo", price: "Desde $2,990", icon: "👨‍🏫" },
+                        { type: "toolkit", title: "Toolkits", desc: "Rúbricas y checklists", price: "Desde $499", icon: "🛠️" },
+                        { type: "bundle", title: "Bundles", desc: "Paquetes completos", price: "Desde $5,990", icon: "📦" }
+                      ].map((item) => (
+                        <Link
+                          key={item.type}
+                          to={`/recursos?tipo=${item.type}`}
+                          className="p-3 rounded-lg border border-border hover:bg-muted group"
+                          data-analytics={`nav_recursos_${item.type}`}
+                        >
+                          <div className="text-lg mb-1">{item.icon}</div>
+                          <div className="text-sm font-semibold">{item.title}</div>
+                          <div className="text-xs text-muted-foreground mt-1">{item.desc}</div>
+                          <div className="text-xs text-primary font-medium mt-1">{item.price}</div>
+                        </Link>
+                      ))}
+                    </div>
+                    <div className="mt-4 p-3 bg-primary/5 rounded-lg">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="text-sm font-semibold text-primary">Explora todos los recursos</div>
+                          <div className="text-xs text-muted-foreground">Catálogo completo con filtros avanzados</div>
+                        </div>
+                        <Link
+                          to="/recursos"
+                          className="text-xs bg-primary text-primary-foreground px-3 py-1 rounded-md hover:shadow-sm transition-all"
+                          data-analytics="nav_recursos_ver_todos"
+                        >
+                          Ver Todo →
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </MegaMenu>
 
               {user && (
                 <NavLink
@@ -516,6 +565,42 @@ const Header: React.FC = () => {
                     </Link>
                   </div>
                 </div>
+
+                <div>
+                  <h3 className="text-xs font-semibold uppercase text-primary mb-2">Recursos</h3>
+                  <div className="space-y-1">
+                    <Link
+                      to="/recursos"
+                      className="block py-2 text-sm hover:text-primary"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      Todos los recursos
+                    </Link>
+                    <Link
+                      to="/recursos?tipo=curso"
+                      className="block py-2 text-sm hover:text-primary"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      Cursos Express
+                    </Link>
+                    <Link
+                      to="/recursos?tipo=plantilla"
+                      className="block py-2 text-sm hover:text-primary"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      Plantillas CONOCER
+                    </Link>
+                     {user && (
+                       <Link
+                         to="/mi-biblioteca"
+                         className="block py-2 text-sm hover:text-primary"
+                         onClick={() => setMobileOpen(false)}
+                       >
+                         Mi Biblioteca
+                       </Link>
+                     )}
+                   </div>
+                 </div>
 
                 {user && (
                   <>
