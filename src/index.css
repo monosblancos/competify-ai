@@ -47,6 +47,9 @@
     --gradient-hero: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
     --gradient-card: linear-gradient(145deg, hsl(var(--card)) 0%, hsl(var(--secondary)) 100%);
     
+    /* Menu and Navigation */
+    --nav-height: 4rem;
+    
     /* Shadows */
     --shadow-sm: 0 1px 3px 0 hsl(var(--primary) / 0.1);
     --shadow-md: 0 4px 12px 0 hsl(var(--primary) / 0.15);
@@ -180,5 +183,33 @@
   
   .gradient-card {
     background: var(--gradient-card);
+  }
+  
+  /* Header Styles */
+  .bg-gradient-primary {
+    background: var(--gradient-primary);
+  }
+  
+  /* Mega Menu Styles */
+  .mega-menu-enter {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  
+  .mega-menu-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 200ms, transform 200ms;
+  }
+  
+  .mega-menu-exit {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .mega-menu-exit-active {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 150ms, transform 150ms;
   }
 }
