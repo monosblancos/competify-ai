@@ -22,16 +22,16 @@ const HomePage: React.FC = () => {
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in">
                 <Link
-                  to="/analisis-cv"
+                  to="/onboarding"
                   className="btn-hero"
                 >
-                  Analizar mi CV Gratis
+                  Comenzar mi Plan de Carrera
                 </Link>
                 <Link
-                  to="/register"
+                  to="/login"
                   className="btn-secondary bg-white/10 text-white border-white/20 hover:bg-white/20"
                 >
-                  Crear Cuenta
+                  Iniciar Sesión
                 </Link>
               </div>
             </div>
@@ -106,16 +106,16 @@ const HomePage: React.FC = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              to="/analisis-cv"
+              to="/onboarding"
               className="btn-hero bg-white text-primary hover:bg-white/90 hover:shadow-glow"
             >
-              Analizar CV Gratis
+              Comenzar Ahora
             </Link>
             <Link
-              to="/register"
+              to="/login"
               className="btn-secondary bg-white/10 text-white border-white/20 hover:bg-white/20"
             >
-              Crear Cuenta
+              Iniciar Sesión
             </Link>
           </div>
         </div>
