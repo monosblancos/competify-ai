@@ -381,6 +381,31 @@ const ChatbotExploracionPage: React.FC = () => {
     handleSendMessage(suggestion);
   };
 
+  // Enhanced message content rendering with standard code citations
+  const renderMessageContent = (content: string) => {
+    // Split content by standard code pattern [ECXXXX]
+    const parts = content.split(/(\[EC\d+(?:\.\d+)?\])/g);
+    
+    return parts.map((part, index) => {
+      const standardCodeMatch = part.match(/^\[EC(\d+(?:\.\d+)?)\]$/);
+      
+      if (standardCodeMatch) {
+        const standardCode = `EC${standardCodeMatch[1]}`;
+        return (
+          <span
+            key={index}
+            className="inline-flex items-center px-2 py-1 mx-1 text-xs font-medium rounded-full bg-primary/10 text-primary border border-primary/20 cursor-pointer hover:bg-primary/20 transition-colors"
+            title={`Estándar de competencia ${standardCode}`}
+          >
+            {part}
+          </span>
+        );
+      }
+      
+      return part;
+    });
+  };
+
 
   const handleEmailCapture = () => {
     if (!sessionData.email) {
@@ -668,7 +693,12 @@ const ChatbotExploracionPage: React.FC = () => {
                       <User className="h-6 w-6 mt-1 text-primary-foreground flex-shrink-0" />
                     )}
                     <div className="flex-1">
-                      <p className="whitespace-pre-wrap">{message.content}</p>
+                      <p className="whitespace-pre-wrap">
+                        {message.type === 'bot' 
+                          ? renderMessageContent(message.content)
+                          : message.content
+                        }
+                      </p>
                       
                       {message.standard && <StandardDisplay standard={message.standard} />}
                       {message.standards && <StandardsListDisplay standards={message.standards} />}
