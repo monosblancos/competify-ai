@@ -18,6 +18,7 @@ import {
   Download,
   Phone,
   Mail,
+  MessageCircle,
   Heart,
   TrendingUp,
   Target,
@@ -669,6 +670,36 @@ const ChatbotExploracionPage: React.FC = () => {
 
       {/* Chat Container */}
       <div className="max-w-4xl mx-auto p-4 h-[calc(100vh-120px)] flex flex-col">
+        
+        {/* Contact Info Banner - Only show if no messages yet */}
+        {messages.length === 0 && (
+          <div className="mb-4 p-4 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg border border-primary/20">
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div>
+                <h3 className="font-semibold text-primary">¿Necesitas ayuda personalizada?</h3>
+                <p className="text-sm text-muted-foreground">Contacta a nuestros expertos en certificación</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <a 
+                  href="mailto:administracion@certificaglobal.com"
+                  className="flex items-center gap-2 px-3 py-2 bg-background/50 rounded-lg border hover:bg-background transition-colors"
+                >
+                  <Mail className="h-4 w-4" />
+                  <span className="text-sm">Email</span>
+                </a>
+                <a 
+                  href="https://wa.me/5527672486"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-3 py-2 bg-green-500/10 text-green-600 rounded-lg border border-green-500/20 hover:bg-green-500/20 transition-colors"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  <span className="text-sm">WhatsApp</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto space-y-4 mb-4">

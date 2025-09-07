@@ -44,107 +44,113 @@ serve(async (req) => {
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
     const geminiApiKey = Deno.env.get('GOOGLE_AI_API_KEY');
 
-    if (!openAIApiKey || !geminiApiKey) {
-      throw new Error('API keys not found');
+    if (!geminiApiKey) {
+      throw new Error('Gemini API key not found');
     }
 
     console.log('Processing RAG chatbot request:', { message, sessionId });
 
-    // Step 1: Generate embedding for user's message
-    console.log('Generating embedding for user message...');
-    const embeddingResponse = await fetch('https://api.openai.com/v1/embeddings', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'text-embedding-3-small',
-        input: message
-      }),
-    });
-
-    if (!embeddingResponse.ok) {
-      const errorText = await embeddingResponse.text();
-      console.error('OpenAI Embedding Error:', errorText);
-      throw new Error(`Failed to generate embedding: ${errorText}`);
-    }
-
-    const embeddingData = await embeddingResponse.json();
-    const queryEmbedding = embeddingData.data[0].embedding;
-
-    // Step 2: Search for similar standards using vector similarity
-    console.log('Searching for similar standards with embeddings...');
+    // Step 1: Always start with text search (more reliable)
+    console.log('Starting with direct text search...');
     let similarStandards: any[] = [];
-    
+
     try {
-      const { data: vectorResults, error: searchError } = await supabaseClient
-        .rpc('search_standards_by_similarity', {
-          query_embedding: queryEmbedding,
-          match_threshold: 0.5,
-          match_count: 8
+      const { data: textResults, error: textError } = await supabaseClient
+        .rpc('search_standards_by_text', {
+          search_query: message,
+          match_count: 5
         });
 
-      if (searchError) {
-        console.error('Vector search error:', searchError);
+      if (textError) {
+        console.error('Text search error:', textError);
       } else {
-        similarStandards = vectorResults || [];
-        console.log(`Found ${similarStandards.length} standards via vector search`);
+        similarStandards = (textResults || []).map((standard: any) => ({
+          ...standard,
+          similarity: 0.8 // Default high similarity for text matches
+        }));
+        console.log(`Found ${similarStandards.length} standards via text search`);
       }
     } catch (error) {
-      console.error('Vector search failed:', error);
+      console.error('Text search failed:', error);
     }
 
-    // Step 2.5: Fallback to text search if vector search fails or returns no results
-    if (similarStandards.length === 0) {
-      console.log('Falling back to text search...');
+    // Step 2: Try vector search only if OpenAI key is available and text search didn't find much
+    if (similarStandards.length < 3 && openAIApiKey) {
+      console.log('Attempting vector search as supplement...');
       try {
-        const { data: textResults, error: textError } = await supabaseClient
-          .rpc('search_standards_by_text', {
-            search_query: message,
-            match_count: 5
-          });
+        const embeddingResponse = await fetch('https://api.openai.com/v1/embeddings', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${openAIApiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'text-embedding-3-small',
+            input: message
+          }),
+        });
 
-        if (textError) {
-          console.error('Text search error:', textError);
+        if (embeddingResponse.ok) {
+          const embeddingData = await embeddingResponse.json();
+          const queryEmbedding = embeddingData.data[0].embedding;
+
+          const { data: vectorResults, error: vectorError } = await supabaseClient
+            .rpc('search_standards_by_similarity', {
+              query_embedding: queryEmbedding,
+              match_threshold: 0.5,
+              match_count: 5
+            });
+
+          if (!vectorError && vectorResults && vectorResults.length > 0) {
+            // Merge results, avoiding duplicates
+            const existingCodes = new Set(similarStandards.map(s => s.code));
+            const newResults = vectorResults.filter(s => !existingCodes.has(s.code));
+            similarStandards = [...similarStandards, ...newResults];
+            console.log(`Added ${newResults.length} more standards via vector search`);
+          }
         } else {
-          similarStandards = (textResults || []).map((standard: any) => ({
-            ...standard,
-            similarity: 0.7 // Default similarity for text matches
-          }));
-          console.log(`Found ${similarStandards.length} standards via text search`);
+          console.warn('Vector search failed, continuing with text results');
         }
       } catch (error) {
-        console.error('Text search failed:', error);
+        console.warn('Vector search failed, continuing with text results:', error);
       }
     }
 
-    // Check if we have any standards with embeddings
+    console.log(`Found ${similarStandards?.length || 0} similar standards total`);
+
+    // Step 3: If no specific standards found, provide general guidance with contact info
     if (!similarStandards || similarStandards.length === 0) {
-      const { data: embeddingCheck } = await supabaseClient
-        .from('standards')
-        .select('code')
-        .not('embedding', 'is', null)
-        .limit(1);
+      console.log('No specific standards found, providing general guidance');
       
-      if (!embeddingCheck || embeddingCheck.length === 0) {
-        console.warn('No embeddings found in standards table');
-        return new Response(JSON.stringify({
-          message: 'El sistema de recomendaciones inteligentes aún se está inicializando. Por favor, utiliza el botón "Inicializar RAG" para configurar la base de conocimientos, o realiza una búsqueda manual en nuestra lista de estándares.',
-          sessionId: sessionId || crypto.randomUUID(),
-          relevantStandards: [],
-          context: {
-            standardsFound: 0,
-            searchQuery: message,
-            systemStatus: 'embeddings_not_initialized'
-          }
-        }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
+      const generalResponse = `¡Hola! Soy el asistente de Certifica Global. 
+
+No encontré estándares específicos para tu consulta "${message}", pero puedo ayudarte de otras formas:
+
+🔍 **Explora nuestros estándares**: Navega por nuestra lista completa de estándares de competencia
+📋 **Análisis personalizado**: Sube tu CV para obtener recomendaciones específicas
+💼 **Oportunidades laborales**: Revisa las vacantes disponibles
+
+📞 **¿Necesitas ayuda personalizada?**
+• Email: administracion@certificaglobal.com  
+• WhatsApp: 5527672486
+
+¿En qué área específica te gustaría certificarte? Puedo sugerirte estándares por sector como tecnología, administración, ventas, etc.`;
+
+      return new Response(JSON.stringify({
+        message: generalResponse,
+        sessionId: sessionId || crypto.randomUUID(),
+        relevantStandards: [],
+        context: {
+          standardsFound: 0,
+          searchQuery: message,
+          responseType: 'general_guidance'
+        }
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
-    // Step 3: Get or create chat session
+    // Step 4: Get or create chat session
     let chatSession: ChatSession;
     
     if (sessionId) {
@@ -159,20 +165,20 @@ serve(async (req) => {
       chatSession = { id: crypto.randomUUID(), messages: [] };
     }
 
-    // Step 4: Build context from similar standards
+    // Step 5: Build context from similar standards
     const contextText = similarStandards && similarStandards.length > 0
       ? similarStandards.map(standard => 
           `**[${standard.code}]**: ${standard.title}\n*Categoría: ${standard.category}*\n${standard.description}\n---`
         ).join('\n')
       : 'No se encontraron estándares relevantes en la base de datos.';
 
-    // Step 5: Build conversation history for context
+    // Step 6: Build conversation history for context
     const conversationHistory = chatSession.messages
       .slice(-6) // Keep last 6 messages for context
       .map(msg => `${msg.role === 'user' ? 'Usuario' : 'Asistente'}: ${msg.content}`)
       .join('\n');
 
-    // Step 6: Create augmented prompt
+    // Step 7: Create augmented prompt
     const augmentedPrompt = `Actúa como un asesor experto en competencias laborales de Certifica Global. Tu conocimiento se limita ESTRICTAMENTE a la información de contexto proporcionada.
 
 **INSTRUCCIONES CRÍTICAS:**
@@ -195,7 +201,7 @@ ${message}
 
 **TU RESPUESTA (basada EXCLUSIVAMENTE en el contexto):**`;
 
-    // Step 7: Call Gemini API
+    // Step 8: Call Gemini API
     console.log('Calling Gemini API...');
     const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`, {
       method: 'POST',
@@ -226,7 +232,7 @@ ${message}
     const geminiData = await geminiResponse.json();
     const assistantResponse = geminiData.candidates[0].content.parts[0].text;
 
-    // Step 8: Update chat session with new messages
+    // Step 9: Update chat session with new messages
     chatSession.messages.push(
       { role: 'user', content: message },
       { role: 'assistant', content: assistantResponse }
@@ -237,7 +243,7 @@ ${message}
       chatSession.messages = chatSession.messages.slice(-10);
     }
 
-    // Step 9: Save/update chat session
+    // Step 10: Save/update chat session
     const { error: sessionError } = await supabaseClient
       .from('chat_sessions')
       .upsert({
@@ -251,7 +257,7 @@ ${message}
       // Don't throw here, just log - the response is still valid
     }
 
-    // Step 10: Return response with relevant standards
+    // Step 11: Return response with relevant standards
     const response = {
       message: assistantResponse,
       sessionId: chatSession.id,
