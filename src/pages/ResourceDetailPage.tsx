@@ -13,6 +13,11 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useExitIntent } from '@/hooks/useExitIntent';
+import ExitIntentOffer from '@/components/marketing/ExitIntentOffer';
+import UrgencyBanner from '@/components/marketing/UrgencyBanner';
+import SocialProofWidget from '@/components/marketing/SocialProofWidget';
+import PricingStrategy from '@/components/marketing/PricingStrategy';
 
 interface ResourceProduct {
   id: string;
@@ -53,6 +58,18 @@ const ResourceDetailPage = () => {
   const [couponCode, setCouponCode] = useState('');
   const [couponApplied, setCouponApplied] = useState(false);
   const [discount, setDiscount] = useState(0);
+  const [showExitIntent, setShowExitIntent] = useState(false);
+  const [exitIntentShown, setExitIntentShown] = useState(false);
+
+  // Exit intent detection
+  const exitIntent = useExitIntent();
+
+  useEffect(() => {
+    if (exitIntent && !exitIntentShown && resource && !hasAccess && !resource.is_free) {
+      setShowExitIntent(true);
+      setExitIntentShown(true);
+    }
+  }, [exitIntent, exitIntentShown, resource, hasAccess]);
 
   useEffect(() => {
     if (slug) {
@@ -198,6 +215,14 @@ const ResourceDetailPage = () => {
     }
   };
 
+  const handleExitIntentOffer = (exitCouponCode: string) => {
+    setCouponCode(exitCouponCode);
+    setCouponApplied(true);
+    const discountAmount = Math.round(resource!.price_cents * 0.25); // 25% discount
+    setDiscount(discountAmount);
+    setShowExitIntent(false);
+  };
+
   const formatPrice = (cents: number) => {
     return new Intl.NumberFormat('es-MX', {
       style: 'currency',
@@ -249,9 +274,24 @@ const ResourceDetailPage = () => {
   }
 
   const finalPrice = resource.price_cents - discount;
+  
+  // Marketing timing - create urgency
+  const offerEndTime = new Date();
+  offerEndTime.setHours(offerEndTime.getHours() + 6); // 6 hours from now
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Exit Intent Offer */}
+      {showExitIntent && resource && (
+        <ExitIntentOffer
+          productId={resource.id}
+          productTitle={resource.title}
+          originalPrice={resource.price_cents}
+          onClose={() => setShowExitIntent(false)}
+          onAccept={handleExitIntentOffer}
+        />
+      )}
+
       {/* Breadcrumb */}
       <div className="border-b bg-muted/30">
         <div className="container mx-auto px-4 py-4">
@@ -483,127 +523,123 @@ const ResourceDetailPage = () => {
             )}
           </div>
 
-          {/* Sidebar - Pricing */}
-          <div className="lg:col-span-1">
-            <Card className="sticky top-4">
-              <CardHeader>
-                <div className="aspect-video bg-muted rounded-lg overflow-hidden mb-4">
-                  <img
-                    src={resource.cover_url || '/placeholder.svg'}
-                    alt={resource.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Price */}
-                <div className="text-center">
+          {/* Sidebar - Purchase */}
+          <div className="space-y-6">
+            {/* Urgency Banners */}
+            {!resource.is_free && !hasAccess && (
+              <div className="space-y-2">
+                <UrgencyBanner type="limited_time" endTime={offerEndTime} />
+                <UrgencyBanner type="limited_stock" stockLeft={Math.floor(Math.random() * 12) + 8} />
+                <UrgencyBanner type="demand" studentsCount={resource.total_purchases} />
+              </div>
+            )}
+
+            <Card className="sticky top-6">
+              <CardContent className="p-6">
+                <div className="space-y-6">
+                  {/* Pricing Strategy */}
                   {resource.is_free ? (
-                    <div className="text-3xl font-bold text-green-600">GRATIS</div>
-                  ) : (
-                    <>
-                      <div className="text-3xl font-bold text-primary">
-                        {formatPrice(finalPrice)}
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-green-600 mb-2">GRATIS</div>
+                      <div className="text-sm text-muted-foreground">
+                        Acceso inmediato y permanente
                       </div>
-                      {discount > 0 && (
-                        <div className="text-lg text-muted-foreground line-through">
-                          {formatPrice(resource.price_cents)}
+                    </div>
+                  ) : (
+                    <PricingStrategy
+                      originalPrice={resource.price_cents}
+                      discountedPrice={discount > 0 ? finalPrice : undefined}
+                      discountPercent={discount > 0 ? Math.round((discount / resource.price_cents) * 100) : undefined}
+                      guaranteeDays={resource.guarantee_days}
+                      showValue={true}
+                    />
+                  )}
+
+                  {/* Coupon Code */}
+                  {!resource.is_free && !hasAccess && (
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2">
+                          <Gift className="w-4 h-4 text-orange-500" />
+                          <label className="text-sm font-medium">¿Tienes un código de descuento?</label>
+                        </div>
+                        <div className="flex gap-2">
+                          <Input
+                            placeholder="Ingresa tu cupón"
+                            value={couponCode}
+                            onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                            disabled={couponApplied}
+                            className="flex-1"
+                          />
+                          <Button
+                            variant="outline"
+                            onClick={applyCoupon}
+                            disabled={!couponCode || couponApplied}
+                            size="sm"
+                          >
+                            Aplicar
+                          </Button>
+                        </div>
+                        {couponApplied && (
+                          <div className="flex items-center gap-2 text-sm text-green-600">
+                            <CheckCircle className="w-4 h-4" />
+                            Cupón aplicado correctamente
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Purchase Button */}
+                  {hasAccess ? (
+                    <Button asChild className="w-full bg-green-600 hover:bg-green-700" size="lg">
+                      <Link to="/mi-biblioteca">
+                        <Download className="w-4 h-4 mr-2" />
+                        Acceder a mi Biblioteca
+                      </Link>
+                    </Button>
+                  ) : (
+                    <div className="space-y-3">
+                      <Button 
+                        onClick={handlePurchase}
+                        disabled={purchasing}
+                        className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 text-lg shadow-lg hover:shadow-xl transition-all"
+                        size="lg"
+                      >
+                        {purchasing ? (
+                          "Procesando compra..."
+                        ) : resource.is_free ? (
+                          <>
+                            <Download className="w-5 h-5 mr-2" />
+                            ¡Obtener GRATIS Ahora!
+                          </>
+                        ) : (
+                          <>
+                            <Shield className="w-5 h-5 mr-2" />
+                            🔥 ¡COMPRAR AHORA! 🔥
+                          </>
+                        )}
+                      </Button>
+                      
+                      {!resource.is_free && (
+                        <div className="text-center space-y-2">
+                          <p className="text-xs text-gray-500">
+                            ⚡ Acceso instantáneo tras el pago
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            🛡️ Compra protegida al 100%
+                          </p>
                         </div>
                       )}
-                      <div className="text-sm text-muted-foreground">
-                        Acceso de por vida • Actualizaciones incluidas
-                      </div>
-                    </>
+                    </div>
                   )}
-                </div>
 
-                {/* Coupon */}
-                {!resource.is_free && !couponApplied && (
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">¿Tienes un cupón?</label>
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="Código de cupón"
-                        value={couponCode}
-                        onChange={(e) => setCouponCode(e.target.value)}
-                        className="text-sm"
-                      />
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={applyCoupon}
-                        disabled={!couponCode.trim()}
-                      >
-                        Aplicar
-                      </Button>
-                    </div>
-                  </div>
-                )}
-
-                {couponApplied && (
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                    <div className="flex items-center gap-2 text-green-800 text-sm">
-                      <CheckCircle className="w-4 h-4" />
-                      Cupón "{couponCode}" aplicado
-                    </div>
-                  </div>
-                )}
-
-                {/* Action Button */}
-                {hasAccess ? (
-                  <Button size="lg" className="w-full" asChild>
-                    <Link to="/mi-biblioteca">
-                      <Download className="w-4 h-4 mr-2" />
-                      Ir a Mi Biblioteca
-                    </Link>
-                  </Button>
-                ) : (
-                  <Button 
-                    size="lg" 
-                    className="w-full"
-                    onClick={handlePurchase}
-                    disabled={purchasing}
-                  >
-                    {purchasing ? (
-                      "Procesando..."
-                    ) : resource.is_free ? (
-                      <>
-                        <Download className="w-4 h-4 mr-2" />
-                        Descargar Gratis
-                      </>
-                    ) : (
-                      "Comprar Ahora"
-                    )}
-                  </Button>
-                )}
-
-                {/* Guarantee */}
-                {resource.guarantee_days > 0 && !resource.is_free && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <div className="flex items-center gap-2 text-blue-800 text-sm">
-                      <Shield className="w-4 h-4" />
-                      <span className="font-medium">Garantía de {resource.guarantee_days} días</span>
-                    </div>
-                    <p className="text-xs text-blue-600 mt-1">
-                      Si no estás satisfecho, te devolvemos tu dinero sin preguntas.
-                    </p>
-                  </div>
-                )}
-
-                {/* Social Proof */}
-                {resource.total_purchases > 0 && (
-                  <div className="text-center text-sm text-muted-foreground">
-                    <Users className="w-4 h-4 inline mr-1" />
-                    +{resource.total_purchases} profesionales ya lo usan
-                  </div>
-                )}
-
-                {/* Contact */}
-                <div className="border-t pt-4">
-                  <Button variant="outline" size="sm" className="w-full">
-                    <MessageCircle className="w-4 h-4 mr-2" />
-                    ¿Tienes preguntas?
-                  </Button>
+                  {/* Social Proof Widget */}
+                  <SocialProofWidget
+                    totalPurchases={resource.total_purchases}
+                    rating={resource.rating}
+                    recentPurchases={Math.floor(Math.random() * 8) + 3}
+                  />
                 </div>
               </CardContent>
             </Card>
