@@ -576,6 +576,17 @@ export type Database = {
           title: string
         }[]
       }
+      validate_coupon_code: {
+        Args: { coupon_code_input: string }
+        Returns: {
+          active: boolean
+          code: string
+          discount_pct: number
+          expires_at: string
+          max_uses: number
+          used_count: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

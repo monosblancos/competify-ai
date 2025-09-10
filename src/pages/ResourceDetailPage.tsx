@@ -124,14 +124,22 @@ const ResourceDetailPage = () => {
     if (!couponCode.trim() || !resource) return;
 
     try {
-      const { data: coupon, error } = await supabase
-        .from('resource_coupons')
-        .select('*')
-        .eq('code', couponCode.toUpperCase())
-        .eq('active', true)
-        .single();
+      // Use the secure validate_coupon_code function instead of direct table access
+      const { data: couponData, error } = await supabase.rpc('validate_coupon_code', {
+        coupon_code_input: couponCode.toUpperCase()
+      });
 
-      if (error || !coupon) {
+      if (error) {
+        console.error('Error validating coupon:', error);
+        toast({
+          title: "Error",
+          description: "Ocurrió un error al validar el cupón.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!couponData || couponData.length === 0) {
         toast({
           title: "Cupón no válido",
           description: "El cupón ingresado no existe o ha expirado.",
@@ -140,24 +148,7 @@ const ResourceDetailPage = () => {
         return;
       }
 
-      if (coupon.expires_at && new Date(coupon.expires_at) < new Date()) {
-        toast({
-          title: "Cupón expirado",
-          description: "Este cupón ya no es válido.",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      if (coupon.max_uses && coupon.used_count >= coupon.max_uses) {
-        toast({
-          title: "Cupón agotado",
-          description: "Este cupón ya alcanzó su límite de usos.",
-          variant: "destructive"
-        });
-        return;
-      }
-
+      const coupon = couponData[0];
       const discountAmount = Math.round(resource.price_cents * (coupon.discount_pct / 100));
       setDiscount(discountAmount);
       setCouponApplied(true);
