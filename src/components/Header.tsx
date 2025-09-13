@@ -396,48 +396,130 @@ const Header: React.FC = () => {
                 trigger="Recursos"
                 isActive={activeMenu === "recursos"}
                 onToggle={() => setActiveMenu(activeMenu === "recursos" ? null : "recursos")}
-                badge="MXN"
+                badge="Premium"
                 analytics="nav_recursos_click"
               >
-                <div className="p-6 w-[600px]">
+                <div className="p-6 w-[700px]">
                   <div className="mb-4">
-                    <div className="text-xs font-semibold uppercase text-primary mb-3">
-                      Recursos prácticos · Precios en MXN · Acceso de por vida
+                    <div className="text-xs font-semibold uppercase text-primary mb-4">
+                      Recursos prácticos · Alineados a CONOCER · Acceso de por vida
                     </div>
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-3 gap-3">
                       {[
-                        { type: "ebook", title: "Ebooks & Guías", desc: "Recursos descargables", price: "Desde $149", icon: "📚" },
-                        { type: "plantilla", title: "Plantillas", desc: "Formatos listos CONOCER", price: "Desde $299", icon: "📋" },
-                        { type: "curso", title: "Cursos Express", desc: "Micro-learning 2-6h", price: "Desde $990", icon: "🎥" },
-                        { type: "masterclass", title: "Masterclasses", desc: "Sesiones en vivo", price: "Desde $2,990", icon: "👨‍🏫" },
-                        { type: "toolkit", title: "Toolkits", desc: "Rúbricas y checklists", price: "Desde $499", icon: "🛠️" },
-                        { type: "bundle", title: "Bundles", desc: "Paquetes completos", price: "Desde $5,990", icon: "📦" }
+                        { 
+                          type: "ebook", 
+                          title: "Ebooks & Guías", 
+                          desc: "Recursos descargables con metodologías", 
+                          price: "Desde $199 MXN", 
+                          icon: "📚",
+                          highlight: "PDF optimizado"
+                        },
+                        { 
+                          type: "plantilla", 
+                          title: "Plantillas", 
+                          desc: "Formatos oficiales CONOCER editables", 
+                          price: "Desde $299 MXN", 
+                          icon: "📋",
+                          highlight: "Formato Word"
+                        },
+                        { 
+                          type: "curso", 
+                          title: "Cursos Express", 
+                          desc: "Micro-learning 2-6 horas", 
+                          price: "Desde $1,199 MXN", 
+                          icon: "🎥",
+                          highlight: "Video + certificado"
+                        },
+                        { 
+                          type: "masterclass", 
+                          title: "Masterclasses", 
+                          desc: "Sesiones en vivo con expertos", 
+                          price: "Desde $2,999 MXN", 
+                          icon: "👨‍🏫",
+                          highlight: "En vivo + grabación"
+                        },
+                        { 
+                          type: "toolkit", 
+                          title: "Toolkits", 
+                          desc: "Rúbricas, checklists y evaluaciones", 
+                          price: "Desde $599 MXN", 
+                          icon: "🛠️",
+                          highlight: "Kit completo"
+                        },
+                        { 
+                          type: "bundle", 
+                          title: "Bundles", 
+                          desc: "Paquetes completos por estándar", 
+                          price: "Desde $4,999 MXN", 
+                          icon: "📦",
+                          highlight: "Hasta 60% descuento"
+                        }
                       ].map((item) => (
                         <Link
                           key={item.type}
                           to={`/recursos?tipo=${item.type}`}
-                          className="p-3 rounded-lg border border-border hover:bg-muted group"
+                          className="p-4 rounded-xl border border-border hover:border-primary/50 hover:bg-gradient-to-b hover:from-primary/5 hover:to-transparent group transition-all duration-300"
                           data-analytics={`nav_recursos_${item.type}`}
                         >
-                          <div className="text-lg mb-1">{item.icon}</div>
-                          <div className="text-sm font-semibold">{item.title}</div>
-                          <div className="text-xs text-muted-foreground mt-1">{item.desc}</div>
-                          <div className="text-xs text-primary font-medium mt-1">{item.price}</div>
+                          <div className="text-2xl mb-2">{item.icon}</div>
+                          <div className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">{item.title}</div>
+                          <div className="text-xs text-muted-foreground mt-1 line-clamp-2 min-h-[32px]">{item.desc}</div>
+                          <div className="mt-3 pt-2 border-t border-border/50">
+                            <div className="text-xs font-semibold text-primary">{item.price}</div>
+                            <div className="text-xs text-emerald-600 font-medium">{item.highlight}</div>
+                          </div>
                         </Link>
                       ))}
                     </div>
-                    <div className="mt-4 p-3 bg-primary/5 rounded-lg">
+                    
+                    {/* Featured Resources Section */}
+                    <div className="mt-6 pt-4 border-t border-border/50">
+                      <div className="text-xs font-semibold uppercase text-primary mb-3">
+                        🔥 Más populares
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <Link
+                          to="/recursos?tipo=ebook&nivel=basico"
+                          className="p-3 rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 hover:from-blue-100 hover:to-indigo-100 group"
+                          data-analytics="nav_recursos_featured_ebook"
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-blue-600">📖</span>
+                            <div>
+                              <div className="text-sm font-semibold text-blue-900">Guía Completa EC0217</div>
+                              <div className="text-xs text-blue-700">Impartición de cursos · $299 MXN</div>
+                            </div>
+                          </div>
+                        </Link>
+                        <Link
+                          to="/recursos?tipo=plantilla&estandar=EC0301"
+                          className="p-3 rounded-lg bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 hover:from-emerald-100 hover:to-green-100 group"
+                          data-analytics="nav_recursos_featured_plantilla"
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-emerald-600">📋</span>
+                            <div>
+                              <div className="text-sm font-semibold text-emerald-900">Plantilla Diseño Curricular</div>
+                              <div className="text-xs text-emerald-700">EC0301 · $499 MXN</div>
+                            </div>
+                          </div>
+                        </Link>
+                      </div>
+                    </div>
+                    
+                    {/* CTA Section */}
+                    <div className="mt-6 p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl border border-primary/20">
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="text-sm font-semibold text-primary">Explora todos los recursos</div>
-                          <div className="text-xs text-muted-foreground">Catálogo completo con filtros avanzados</div>
+                          <div className="text-sm font-bold text-primary mb-1">Catálogo completo disponible</div>
+                          <div className="text-xs text-muted-foreground">Filtros por estándar, nivel y tipo · Garantía 7 días</div>
                         </div>
                         <Link
                           to="/recursos"
-                          className="text-xs bg-primary text-primary-foreground px-3 py-1 rounded-md hover:shadow-sm transition-all"
+                          className="text-xs bg-primary text-primary-foreground px-4 py-2 rounded-lg font-medium hover:shadow-lg hover:bg-primary/90 transition-all"
                           data-analytics="nav_recursos_ver_todos"
                         >
-                          Ver Todo →
+                          Explorar →
                         </Link>
                       </div>
                     </div>
@@ -591,33 +673,51 @@ const Header: React.FC = () => {
                   <div className="space-y-1">
                     <Link
                       to="/recursos"
-                      className="block py-2 text-sm hover:text-primary"
+                      className="block py-2 text-sm hover:text-primary font-medium"
                       onClick={() => setMobileOpen(false)}
                     >
-                      Todos los recursos
+                      📚 Todos los recursos
+                    </Link>
+                    <Link
+                      to="/recursos?tipo=ebook"
+                      className="block py-2 text-sm hover:text-primary text-muted-foreground"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      Ebooks & Guías
                     </Link>
                     <Link
                       to="/recursos?tipo=curso"
-                      className="block py-2 text-sm hover:text-primary"
+                      className="block py-2 text-sm hover:text-primary text-muted-foreground"
                       onClick={() => setMobileOpen(false)}
                     >
                       Cursos Express
                     </Link>
                     <Link
                       to="/recursos?tipo=plantilla"
-                      className="block py-2 text-sm hover:text-primary"
+                      className="block py-2 text-sm hover:text-primary text-muted-foreground"
                       onClick={() => setMobileOpen(false)}
                     >
                       Plantillas CONOCER
                     </Link>
+                    <Link
+                      to="/recursos?tipo=masterclass"
+                      className="block py-2 text-sm hover:text-primary text-muted-foreground"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      Masterclasses
+                    </Link>
                      {user && (
-                       <Link
-                         to="/mi-biblioteca"
-                         className="block py-2 text-sm hover:text-primary"
-                         onClick={() => setMobileOpen(false)}
-                       >
-                         Mi Biblioteca
-                       </Link>
+                       <>
+                         <div className="border-t border-border/50 mt-2 pt-2">
+                           <Link
+                             to="/mi-biblioteca"
+                             className="block py-2 text-sm hover:text-primary text-emerald-600 font-medium"
+                             onClick={() => setMobileOpen(false)}
+                           >
+                             📖 Mi Biblioteca
+                           </Link>
+                         </div>
+                       </>
                      )}
                    </div>
                  </div>
