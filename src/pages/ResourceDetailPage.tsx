@@ -283,16 +283,34 @@ const ResourceDetailPage = () => {
         />
       )}
 
-      {/* Breadcrumb */}
-      <div className="border-b bg-muted/30">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center gap-2 text-sm">
-            <Link to="/recursos" className="text-muted-foreground hover:text-foreground">
-              Recursos
-            </Link>
-            <span className="text-muted-foreground">/</span>
-            <span className="text-foreground">{resource.title}</span>
+      {/* Top Urgency Banner */}
+      <div className="bg-gradient-to-r from-orange-500 to-red-600 text-white py-3 sticky top-0 z-50">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Badge className="bg-white/20 text-white border-white/30">
+                🔥 ¡OFERTA ESPECIAL!
+              </Badge>
+              <span className="font-semibold">25% OFF</span>
+              <span className="text-orange-100">Usa el código: <strong>CERTIFICACION25</strong></span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Timer className="w-4 h-4" />
+              <span className="text-sm font-mono">⏰ 04:31:56</span>
+            </div>
           </div>
+        </div>
+      </div>
+
+      {/* Breadcrumb */}
+      <div className="border-b bg-gray-50">
+        <div className="container mx-auto px-4 py-4">
+          <Button variant="ghost" asChild className="mb-2">
+            <Link to="/recursos" className="flex items-center gap-2 text-sm hover:text-primary">
+              <ArrowLeft className="w-4 h-4" />
+              Volver a Recursos
+            </Link>
+          </Button>
         </div>
       </div>
 
@@ -302,80 +320,105 @@ const ResourceDetailPage = () => {
           <div className="lg:col-span-2 space-y-8">
             {/* Hero Section */}
             <section>
-              <div className="flex items-center gap-2 mb-4">
-                <Button variant="ghost" size="sm" asChild>
-                  <Link to="/recursos">
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Volver
-                  </Link>
-                </Button>
-              </div>
-              
-              <div className="flex items-center gap-3 mb-4">
-                <Badge className="bg-primary/10 text-primary">
-                  {getTypeIcon(resource.type)}
-                  <span className="ml-1 capitalize">{resource.type}</span>
+              <div className="mb-6">
+                <Badge className="bg-blue-100 text-blue-700 mb-4">
+                  🏆 CERTIFICACIÓN OFICIAL CONOCER
                 </Badge>
-                {resource.level && (
-                  <Badge variant="secondary">{resource.level}</Badge>
-                )}
-                {resource.standards.map(std => (
-                  <Badge key={std} variant="outline">{std}</Badge>
-                ))}
+                
+                <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
+                  Domina la <span className="text-blue-600">{resource.standards[0] || 'CONOCER'}</span> y Certifícate
+                  <br />
+                  <span className="text-gray-900">Sin Incertidumbre</span>
+                </h1>
+                
+                <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+                  {resource.subtitle || resource.description}
+                </p>
               </div>
 
-              <h1 className="text-4xl font-bold mb-4">{resource.title}</h1>
-              <p className="text-xl text-muted-foreground mb-6">{resource.subtitle}</p>
-
-              <div className="flex items-center gap-6 text-sm text-muted-foreground mb-6">
-                {resource.duration && (
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4" />
-                    {resource.duration}
+              {/* Key Stats */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8 bg-white p-6 rounded-xl shadow-sm border">
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <Clock className="w-6 h-6 text-blue-600" />
                   </div>
-                )}
-                {resource.rating > 0 && (
-                  <div className="flex items-center gap-2">
-                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                    {resource.rating.toFixed(1)} ({resource.total_purchases} estudiantes)
+                  <div className="font-bold text-gray-900">
+                    {resource.type === 'plantilla' ? '25 plantillas' : resource.duration || '4 horas'}
                   </div>
-                )}
-                {resource.instructor && (
-                  <div className="flex items-center gap-2">
-                    <Award className="w-4 h-4" />
-                    {resource.instructor}
+                  <div className="text-sm text-gray-600">
+                    {resource.type === 'plantilla' ? '+ guías' : 'Contenido práctico'}
                   </div>
-                )}
-              </div>
-
-              {/* Hero Media */}
-              {resource.hero_media_url && (
-                <div className="aspect-video bg-muted rounded-lg mb-6 overflow-hidden">
-                  <img
-                    src={resource.hero_media_url}
-                    alt={resource.title}
-                    className="w-full h-full object-cover"
-                  />
                 </div>
-              )}
+                
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <Users className="w-6 h-6 text-green-600" />
+                  </div>
+                  <div className="font-bold text-gray-900">+{resource.total_purchases || 1847}</div>
+                  <div className="text-sm text-gray-600">Profesionales certificados</div>
+                </div>
+                
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <Award className="w-6 h-6 text-purple-600" />
+                  </div>
+                  <div className="font-bold text-gray-900">96.7%</div>
+                  <div className="text-sm text-gray-600">De aprobación</div>
+                </div>
+                
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <Shield className="w-6 h-6 text-yellow-600" />
+                  </div>
+                  <div className="font-bold text-gray-900">Certificados</div>
+                  <div className="text-sm text-gray-600">Oficiales</div>
+                </div>
+              </div>
 
-              <p className="text-base leading-relaxed">{resource.description}</p>
+              {/* Rating */}
+              <div className="flex items-center gap-4 mb-8">
+                <div className="flex items-center gap-2">
+                  <div className="flex">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                    ))}
+                  </div>
+                  <span className="font-bold text-lg">{resource.rating || 4.8}/5</span>
+                </div>
+                <span className="text-gray-600">• Basado en +{Math.floor((resource.total_purchases || 1847) * 0.2)} reseñas verificadas</span>
+              </div>
             </section>
 
             {/* What You'll Achieve */}
-            {resource.outcomes && resource.outcomes.length > 0 && (
-              <section>
-                <h2 className="text-2xl font-bold mb-4">Lo que lograrás</h2>
-                <div className="grid md:grid-cols-2 gap-3">
-                  {resource.outcomes.map((outcome, index) => (
-                    <div key={index} className="flex items-start gap-3">
-                      <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>{outcome}</span>
-                    </div>
-                  ))}
+            <section className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
+                  <span className="text-2xl">🎯</span>
                 </div>
-              </section>
-            )}
+                <h2 className="text-2xl font-bold text-gray-900">Lo que Lograrás con Este Curso</h2>
+              </div>
+              
+              <p className="text-gray-700 mb-6 text-lg">
+                Más que memorizar información, desarrollarás <strong>confianza absoluta</strong> en tu competencia. 
+                Cada módulo está diseñado para que sientas que tienes ventaja sobre otros candidatos.
+              </p>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                {(resource.outcomes && Array.isArray(resource.outcomes) ? resource.outcomes : [
+                  "Ahorra 80+ horas de trabajo",
+                  "Plantillas validadas por evaluadores", 
+                  "Formato profesional garantizado",
+                  "Cumple 100% con requisitos CONOCER"
+                ]).map((outcome, index) => (
+                  <div key={index} className="flex items-start gap-3 p-3 bg-white/60 rounded-lg">
+                    <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <CheckCircle className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-gray-800 font-medium">{outcome}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
 
             {/* Target Audience */}
             {resource.target_audience && resource.target_audience.length > 0 && (
@@ -516,47 +559,126 @@ const ResourceDetailPage = () => {
 
           {/* Sidebar - Purchase */}
           <div className="space-y-6">
-            {/* Urgency Banners */}
-            {!resource.is_free && !hasAccess && (
-              <div className="space-y-2">
-                <UrgencyBanner type="limited_time" endTime={offerEndTime} />
-                <UrgencyBanner type="limited_stock" stockLeft={Math.floor(Math.random() * 12) + 8} />
-                <UrgencyBanner type="demand" studentsCount={resource.total_purchases} />
-              </div>
-            )}
-
-            <Card className="sticky top-6">
+            {/* Urgency Card */}
+            <Card className="sticky top-6 border-red-200 bg-gradient-to-br from-red-50 to-orange-50">
               <CardContent className="p-6">
                 <div className="space-y-6">
-                  {/* Pricing Strategy */}
+                  {/* Urgency Badge */}
+                  <div className="text-center">
+                    <Badge className="bg-red-500 text-white px-4 py-2 text-sm font-bold mb-4">
+                      ⚡ OFERTA POR TIEMPO LIMITADO!
+                    </Badge>
+                    
+                    {/* Countdown */}
+                    <div className="bg-orange-500 text-white rounded-lg p-4 mb-4">
+                      <div className="flex items-center justify-center gap-2 mb-2">
+                        <Timer className="w-5 h-5" />
+                        <span className="text-sm font-medium">Esta oferta expira en:</span>
+                      </div>
+                      <div className="text-3xl font-bold font-mono">04 : 31 : 56</div>
+                      <div className="text-xs text-orange-100">HORAS - MINUTOS - SEGUNDOS</div>
+                    </div>
+
+                    <h3 className="text-xl font-bold text-gray-900 mb-4">
+                      Oferta Especial de Lanzamiento
+                    </h3>
+                  </div>
+
+                  {/* Pricing */}
                   {resource.is_free ? (
                     <div className="text-center">
-                      <div className="text-3xl font-bold text-green-600 mb-2">GRATIS</div>
-                      <div className="text-sm text-muted-foreground">
-                        Acceso inmediato y permanente
-                      </div>
+                      <div className="text-4xl font-bold text-green-600 mb-2">GRATIS</div>
+                      <div className="text-sm text-gray-600">Descarga inmediata</div>
                     </div>
                   ) : (
-                    <PricingStrategy
-                      originalPrice={resource.price_cents}
-                      discountedPrice={discount > 0 ? finalPrice : undefined}
-                      discountPercent={discount > 0 ? Math.round((discount / resource.price_cents) * 100) : undefined}
-                      guaranteeDays={resource.guarantee_days}
-                      showValue={true}
-                    />
+                    <div className="text-center">
+                      <div className="mb-4">
+                        <div className="flex items-center justify-center gap-3 mb-2">
+                          <span className="text-xl text-gray-400 line-through">
+                            {formatPrice(Math.round(resource.price_cents * 1.33))} MXN
+                          </span>
+                          <Badge className="bg-red-500 text-white">-25%</Badge>
+                        </div>
+                        <div className="text-5xl font-bold text-blue-600 mb-1">
+                          {formatPrice(discount > 0 ? finalPrice : resource.price_cents)}
+                        </div>
+                        <div className="text-sm text-gray-600 mb-4">
+                          O 3 pagos sin intereses de <strong>{formatPrice(Math.round(resource.price_cents / 3))}</strong>
+                        </div>
+                      </div>
+                    </div>
                   )}
+
+                  {/* Purchase Button */}
+                  {hasAccess ? (
+                    <Button asChild className="w-full bg-green-600 hover:bg-green-700" size="lg">
+                      <Link to="/mi-biblioteca">
+                        <Download className="w-4 h-4 mr-2" />
+                        Acceder a mi Biblioteca
+                      </Link>
+                    </Button>
+                  ) : (
+                    <Button 
+                      onClick={handlePurchase}
+                      disabled={purchasing}
+                      className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 text-lg shadow-lg hover:shadow-xl transition-all"
+                      size="lg"
+                    >
+                      {purchasing ? (
+                        "Procesando compra..."
+                      ) : resource.is_free ? (
+                        <>
+                          <Download className="w-5 h-5 mr-2" />
+                          ¡Descargar GRATIS Ahora!
+                        </>
+                      ) : (
+                        <>
+                          <Lock className="w-5 h-5 mr-2" />
+                          Inscríbeme al Curso Ahora
+                        </>
+                      )}
+                    </Button>
+                  )}
+
+                  {/* Guarantees */}
+                  <div className="space-y-3 pt-4 border-t border-gray-200">
+                    <div className="flex items-center gap-3 text-sm">
+                      <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
+                        <CheckCircle className="w-3 h-3 text-green-600" />
+                      </div>
+                      <span className="text-green-700 font-medium">Garantía de Satisfacción Total - Sin preguntas</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm">
+                      <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
+                        <CheckCircle className="w-3 h-3 text-green-600" />
+                      </div>
+                      <span className="text-green-700 font-medium">Acceso inmediato</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm">
+                      <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
+                        <CheckCircle className="w-3 h-3 text-green-600" />
+                      </div>
+                      <span className="text-green-700 font-medium">Certificados oficiales</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm">
+                      <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
+                        <CheckCircle className="w-3 h-3 text-green-600" />
+                      </div>
+                      <span className="text-green-700 font-medium">Soporte 24/7</span>
+                    </div>
+                  </div>
 
                   {/* Coupon Code */}
                   {!resource.is_free && !hasAccess && (
-                    <div className="bg-gray-50 rounded-lg p-4">
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                       <div className="space-y-3">
                         <div className="flex items-center gap-2">
-                          <Gift className="w-4 h-4 text-orange-500" />
-                          <label className="text-sm font-medium">¿Tienes un código de descuento?</label>
+                          <Gift className="w-4 h-4 text-yellow-600" />
+                          <label className="text-sm font-medium text-yellow-800">¿Tienes un código de descuento?</label>
                         </div>
                         <div className="flex gap-2">
                           <Input
-                            placeholder="Ingresa tu cupón"
+                            placeholder="Ej: CERTIFICACION25"
                             value={couponCode}
                             onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                             disabled={couponApplied}
@@ -574,63 +696,12 @@ const ResourceDetailPage = () => {
                         {couponApplied && (
                           <div className="flex items-center gap-2 text-sm text-green-600">
                             <CheckCircle className="w-4 h-4" />
-                            Cupón aplicado correctamente
+                            ¡Cupón aplicado! Descuento adicional activado
                           </div>
                         )}
                       </div>
                     </div>
                   )}
-
-                  {/* Purchase Button */}
-                  {hasAccess ? (
-                    <Button asChild className="w-full bg-green-600 hover:bg-green-700" size="lg">
-                      <Link to="/mi-biblioteca">
-                        <Download className="w-4 h-4 mr-2" />
-                        Acceder a mi Biblioteca
-                      </Link>
-                    </Button>
-                  ) : (
-                    <div className="space-y-3">
-                      <Button 
-                        onClick={handlePurchase}
-                        disabled={purchasing}
-                        className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 text-lg shadow-lg hover:shadow-xl transition-all"
-                        size="lg"
-                      >
-                        {purchasing ? (
-                          "Procesando compra..."
-                        ) : resource.is_free ? (
-                          <>
-                            <Download className="w-5 h-5 mr-2" />
-                            ¡Obtener GRATIS Ahora!
-                          </>
-                        ) : (
-                          <>
-                            <Shield className="w-5 h-5 mr-2" />
-                            🔥 ¡COMPRAR AHORA! 🔥
-                          </>
-                        )}
-                      </Button>
-                      
-                      {!resource.is_free && (
-                        <div className="text-center space-y-2">
-                          <p className="text-xs text-gray-500">
-                            ⚡ Acceso instantáneo tras el pago
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            🛡️ Compra protegida al 100%
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Social Proof Widget */}
-                  <SocialProofWidget
-                    totalPurchases={resource.total_purchases}
-                    rating={resource.rating}
-                    recentPurchases={Math.floor(Math.random() * 8) + 3}
-                  />
                 </div>
               </CardContent>
             </Card>
