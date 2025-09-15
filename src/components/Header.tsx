@@ -16,6 +16,53 @@ const Header: React.FC = () => {
   const [query, setQuery] = useState("");
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const { suggestions, isLoading } = useStandardsSuggestions(query);
+  const [copiedPrompt, setCopiedPrompt] = useState(false);
+  const optimizedPrompt = `Prompt optimizado para Claude con explicación de la Metodología Certifica Global
+Evalúa el siguiente capítulo con base en la Metodología Certifica Global, un enfoque integral de transformación profesional basado en 9 pasos secuenciales y 8 dimensiones clave.
+________________________________________
+🔍 Metodología Certifica Global – Marco de evaluación
+Certifica Global es un sistema diseñado para transformar la experiencia laboral en poder profesional validado, a través de una hoja de ruta en 9 pasos, acompañada por 8 dimensiones transversales que garantizan impacto real, ético y sostenible.
+🧭 Los 9 pasos estratégicos son:
+1. Activación de Identidad Profesional
+2. Definición del Propósito Transformador
+3. Diseño Estratégico del Aprendizaje
+4. Activadores de Aprendizaje y Reflexión
+5. Fortalecimiento del Portafolio de Evidencias
+6. Simulación de Evaluación + Retroalimentación
+7. Evaluación Formal y Logro de Certificación
+8. Visibilización y Posicionamiento del Perfil Profesional
+9. Expansión de Impacto y Liderazgo Multiplicador
+🔷 Las 8 dimensiones a evaluar en cada capítulo son:
+1️⃣ Identitaria: ¿Conecta con la historia, dignidad y autenticidad del lector?
+2️⃣ Transformadora: ¿Genera cambios reales y deseables en la vida del lector?
+3️⃣ Estratégica: ¿Se articula como parte de un proceso secuenciado?
+4️⃣ Técnica: ¿Incorpora herramientas, conceptos y datos útiles o verificables?
+5️⃣ Emocional-reflexiva: ¿Activa la introspección y el compromiso interno?
+6️⃣ Transferencia laboral: ¿Tiene impacto real en el mundo del trabajo?
+7️⃣ Ética y social: ¿Contribuye a un cambio justo, colectivo o sostenible?
+8️⃣ Evaluación integral: ¿Permite al lector autoevaluar, seguir su progreso o tomar decisiones informadas?
+________________________________________
+🧠 Tareas para Claude
+A partir del texto que te daré a continuación:
+1. Evalúa si cada dimensión está presente y con qué fuerza (puntuación del 1 al 5).
+2. Identifica qué pasos de la metodología se hacen explícitos o implícitos.
+3. Indica si el lector entiende que su transformación es producto de un proceso estructurado y replicable, no solo inspiración.
+4. Sugiere cómo reforzar la presencia metodológica sin sacrificar el estilo motivador o narrativo del capítulo.
+5. Confirma si Certifica Global queda posicionado como sistema profesional, estratégico y ético.
+________________________________________
+Finaliza tu respuesta con:
+• 📊 Una tabla resumen con puntuación 1 a 5 por dimensión.
+• ✍️ Un listado claro de recomendaciones.
+• 🚩 Alertas sobre posibles áreas débiles del capítulo.`;
+  const copyPrompt = async () => {
+    try {
+      await navigator.clipboard.writeText(optimizedPrompt);
+      setCopiedPrompt(true);
+      setTimeout(() => setCopiedPrompt(false), 2000);
+    } catch (e) {
+      // ignore
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -280,31 +327,81 @@ const Header: React.FC = () => {
                 onToggle={() => setActiveMenu(activeMenu === "certificaciones" ? null : "certificaciones")}
                 analytics="nav_cert_click"
               >
-                <div className="p-6 w-96">
-                  <div className="mb-4">
-                    <div className="text-xs font-semibold uppercase text-primary mb-3">
-                      Core Standards · +Empleabilidad · Rutas claras · Evidencia
+                <div className="p-6 w-[720px]">
+                  <div className="grid grid-cols-2 gap-6">
+                    {/* Columna izquierda: Core Standards */}
+                    <div>
+                      <div className="mb-3 text-xs font-semibold uppercase text-primary">
+                        Core Standards · +Empleabilidad · Rutas claras · Evidencia
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        {[
+                          { code: "EC0217", title: "Impartición de cursos", benefit: "Formación corporativa" },
+                          { code: "EC0301", title: "Diseño curricular", benefit: "Educación digital" },
+                          { code: "EC0366", title: "Desarrollo de software", benefit: "Tech skills" },
+                          { code: "EC0076", title: "Evaluación de competencias", benefit: "RRHH avanzado" }
+                        ].map((standard) => (
+                          <Link
+                            key={standard.code}
+                            to={`/checkout?curso=${standard.code}`}
+                            className="p-3 rounded-lg border border-border hover:bg-muted group"
+                            data-analytics={`nav_cert_core_${standard.code.toLowerCase()}`}
+                          >
+                            <div className="text-sm font-semibold flex items-center justify-between">
+                              <span>{standard.code}</span>
+                              <span className="text-[10px] text-muted-foreground">{standard.benefit}</span>
+                            </div>
+                            <div className="text-xs text-muted-foreground mt-1 line-clamp-1">{standard.title}</div>
+                            <div className="mt-2 flex items-center justify-between text-xs">
+                              <span className="text-primary font-medium group-hover:underline">Inscríbete →</span>
+                              <Link to={`/estandares/${standard.code}`} className="text-muted-foreground hover:text-foreground underline-offset-2 hover:underline" onClick={(e)=> e.stopPropagation()}>
+                                Ver detalles
+                              </Link>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      {[
-                        { code: "EC0217", title: "Impartición de cursos", benefit: "Formación corporativa" },
-                        { code: "EC0301", title: "Diseño curricular", benefit: "Educación digital" },
-                        { code: "EC0366", title: "Desarrollo de software", benefit: "Tech skills" },
-                        { code: "EC0076", title: "Evaluación de competencias", benefit: "RRHH avanzado" }
-                      ].map((standard) => (
-                        <Link
-                          key={standard.code}
-                          to={`/checkout?curso=${standard.code}`}
-                          className="p-3 rounded-lg border border-border hover:bg-muted group"
-                          data-analytics={`nav_cert_core_${standard.code.toLowerCase()}`}
-                        >
-                          <div className="text-sm font-semibold">{standard.code}</div>
-                          <div className="text-xs text-muted-foreground mt-1">{standard.benefit}</div>
-                          <div className="text-xs text-primary font-medium mt-1 group-hover:underline">
-                            Inscríbete →
-                          </div>
-                        </Link>
-                      ))}
+
+                    {/* Columna derecha: Lead Magnet + Metodología */}
+                    <div className="rounded-xl border border-border overflow-hidden">
+                      <div className="p-4 bg-gradient-primary text-primary-foreground">
+                        <div className="text-xs font-semibold tracking-wide mb-1">Lead Magnet</div>
+                        <div className="text-sm font-bold">🎁 Kit de Certificación Gratis</div>
+                        <div className="text-xs opacity-90">Guía 9 pasos · Plantillas · Autoevaluación</div>
+                        <div className="mt-3 flex gap-2">
+                          <Link to="/recursos?tipo=toolkit" className="px-3 py-1.5 rounded-md bg-white/90 text-foreground text-xs font-medium hover:bg-white">
+                            Descargar kit
+                          </Link>
+                          <button onClick={copyPrompt} className="px-3 py-1.5 rounded-md bg-secondary text-secondary-foreground text-xs font-medium hover:bg-secondary/80">
+                            {copiedPrompt ? '¡Prompt copiado!' : 'Copiar prompt metodología'}
+                          </button>
+                        </div>
+                      </div>
+                      <div className="p-4 bg-card">
+                        <div className="text-xs font-semibold text-primary mb-2">Metodología Certifica Global™</div>
+                        <ul className="grid grid-cols-2 gap-2 text-[12px] text-muted-foreground">
+                          {[
+                            '1) Identidad Profesional',
+                            '2) Propósito Transformador',
+                            '3) Diseño del Aprendizaje',
+                            '4) Activadores & Reflexión',
+                            '5) Portafolio de Evidencias',
+                            '6) Simulación + Feedback',
+                            '7) Evaluación Formal',
+                            '8) Posicionamiento del Perfil',
+                            '9) Liderazgo Multiplicador'
+                          ].map((step) => (
+                            <li key={step} className="flex items-center gap-2">
+                              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                              <span>{step}</span>
+                            </li>
+                          ))}
+                        </ul>
+                        <div className="mt-3 text-[11px] text-muted-foreground">
+                          Evalúa cualquier capítulo con 8 dimensiones: identidad, transformación, estrategia, técnica, emocional, transferencia laboral, ética y evaluación integral.
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
