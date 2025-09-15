@@ -327,79 +327,151 @@ Finaliza tu respuesta con:
                 onToggle={() => setActiveMenu(activeMenu === "certificaciones" ? null : "certificaciones")}
                 analytics="nav_cert_click"
               >
-                <div className="p-6 w-[720px]">
-                  <div className="grid grid-cols-2 gap-6">
-                    {/* Columna izquierda: Core Standards */}
+                <div className="p-6 w-[800px]">
+                  <div className="grid grid-cols-3 gap-6">
+                    {/* Columna 1: Core Standards */}
                     <div>
-                      <div className="mb-3 text-xs font-semibold uppercase text-primary">
-                        Core Standards · +Empleabilidad · Rutas claras · Evidencia
+                      <div className="mb-3 text-xs font-semibold uppercase text-primary flex items-center gap-2">
+                        <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                        Core Standards · +Empleabilidad
                       </div>
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-2">
                         {[
-                          { code: "EC0217", title: "Impartición de cursos", benefit: "Formación corporativa" },
-                          { code: "EC0301", title: "Diseño curricular", benefit: "Educación digital" },
-                          { code: "EC0366", title: "Desarrollo de software", benefit: "Tech skills" },
-                          { code: "EC0076", title: "Evaluación de competencias", benefit: "RRHH avanzado" }
+                          { code: "EC0217", title: "Impartición de cursos", benefit: "Formación corporativa", hot: true, students: "2,847" },
+                          { code: "EC0301", title: "Diseño curricular", benefit: "Educación digital", hot: false, students: "1,923" },
+                          { code: "EC0366", title: "Desarrollo de software", benefit: "Tech skills", hot: true, students: "3,241" },
+                          { code: "EC0076", title: "Evaluación de competencias", benefit: "RRHH avanzado", hot: false, students: "1,456" }
                         ].map((standard) => (
-                          <Link
-                            key={standard.code}
-                            to={`/checkout?curso=${standard.code}`}
-                            className="p-3 rounded-lg border border-border hover:bg-muted group"
-                            data-analytics={`nav_cert_core_${standard.code.toLowerCase()}`}
-                          >
-                            <div className="text-sm font-semibold flex items-center justify-between">
-                              <span>{standard.code}</span>
-                              <span className="text-[10px] text-muted-foreground">{standard.benefit}</span>
+                          <div key={standard.code} className="relative p-3 rounded-lg border border-border hover:bg-muted group transition-all">
+                            {standard.hot && (
+                              <div className="absolute -top-1 -right-1 z-10">
+                                <div className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">🔥 HOT</div>
+                              </div>
+                            )}
+                            
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="text-sm font-bold bg-primary text-primary-foreground px-2 py-1 rounded text-center min-w-[60px]">{standard.code}</span>
+                                  <div className="text-[10px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full">{standard.benefit}</div>
+                                </div>
+                                <div className="text-xs text-foreground font-medium mb-2">{standard.title}</div>
+                                
+                                <div className="flex items-center text-[10px] text-muted-foreground mb-2">
+                                  <span className="flex items-center gap-1">
+                                    <span className="w-1 h-1 bg-green-500 rounded-full"></span>
+                                    {standard.students} estudiantes activos
+                                  </span>
+                                </div>
+                                
+                                <div className="flex gap-2">
+                                  <Link to={`/checkout?curso=${standard.code}`} className="text-[11px] bg-gradient-primary text-primary-foreground px-3 py-1 rounded-md font-medium hover:shadow-sm group-hover:scale-105 transition-transform">
+                                    Inscríbete
+                                  </Link>
+                                  <Link to={`/estandares/${standard.code}`} className="text-[11px] border border-border text-muted-foreground px-3 py-1 rounded-md hover:bg-muted" onClick={(e)=> e.stopPropagation()}>
+                                    Ver detalles
+                                  </Link>
+                                </div>
+                              </div>
                             </div>
-                            <div className="text-xs text-muted-foreground mt-1 line-clamp-1">{standard.title}</div>
-                            <div className="mt-2 flex items-center justify-between text-xs">
-                              <span className="text-primary font-medium group-hover:underline">Inscríbete →</span>
-                              <Link to={`/estandares/${standard.code}`} className="text-muted-foreground hover:text-foreground underline-offset-2 hover:underline" onClick={(e)=> e.stopPropagation()}>
-                                Ver detalles
-                              </Link>
-                            </div>
-                          </Link>
+                          </div>
                         ))}
                       </div>
                     </div>
 
-                    {/* Columna derecha: Lead Magnet + Metodología */}
-                    <div className="rounded-xl border border-border overflow-hidden">
-                      <div className="p-4 bg-gradient-primary text-primary-foreground">
-                        <div className="text-xs font-semibold tracking-wide mb-1">Lead Magnet</div>
-                        <div className="text-sm font-bold">🎁 Kit de Certificación Gratis</div>
-                        <div className="text-xs opacity-90">Guía 9 pasos · Plantillas · Autoevaluación</div>
-                        <div className="mt-3 flex gap-2">
-                          <Link to="/recursos?tipo=toolkit" className="px-3 py-1.5 rounded-md bg-white/90 text-foreground text-xs font-medium hover:bg-white">
-                            Descargar kit
-                          </Link>
-                          <button onClick={copyPrompt} className="px-3 py-1.5 rounded-md bg-secondary text-secondary-foreground text-xs font-medium hover:bg-secondary/80">
-                            {copiedPrompt ? '¡Prompt copiado!' : 'Copiar prompt metodología'}
+                    {/* Columna 2: Lead Magnet Kit */}
+                    <div className="rounded-xl border border-purple-200 overflow-hidden bg-gradient-to-br from-purple-50 to-blue-50">
+                      <div className="p-4 bg-gradient-to-r from-purple-600 to-purple-700 text-white">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-lg">🎁</span>
+                          <div>
+                            <div className="text-sm font-bold">Kit Certificación GRATIS</div>
+                            <div className="text-xs opacity-90">Valor: $2,490 MXN</div>
+                          </div>
+                        </div>
+                        <div className="text-xs mb-3 opacity-95">
+                          ✅ Guía 9 pasos · ✅ Plantillas · ✅ Autoevaluación
+                        </div>
+                        <Link to="/recursos?tipo=toolkit" className="inline-block w-full text-center px-3 py-2 rounded-md bg-white text-purple-700 text-xs font-bold hover:bg-gray-50 transition-colors">
+                          📥 Descargar Ahora
+                        </Link>
+                      </div>
+                      <div className="p-4">
+                        <div className="text-xs text-center mb-3">
+                          <div className="text-orange-600 font-semibold">⚡ Solo primeros 500 profesionales</div>
+                          <div className="text-muted-foreground">347 kits restantes</div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 text-[10px]">
+                          {[
+                            '📖 Guía completa 7 pasos',
+                            '📋 Plantillas editables',
+                            '🎯 Test autoevaluación',
+                            '💰 Calculadora ROI',
+                            '📈 Plan de carrera',
+                            '🎥 3 masterclasses'
+                          ].map((item, i) => (
+                            <div key={i} className="flex items-center gap-1">
+                              <span className="w-1 h-1 bg-green-500 rounded-full"></span>
+                              <span className="text-gray-700">{item}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Columna 3: Metodología + Prompt */}
+                    <div className="space-y-4">
+                      <div className="rounded-xl border border-border overflow-hidden bg-card">
+                        <div className="p-3 bg-gradient-primary text-primary-foreground">
+                          <div className="text-xs font-bold tracking-wide">Metodología Certifica Global™</div>
+                          <div className="text-[10px] opacity-90 mt-1">9 Pasos + 8 Dimensiones</div>
+                        </div>
+                        <div className="p-3">
+                          <div className="grid grid-cols-1 gap-1 text-[10px] text-muted-foreground mb-3">
+                            {[
+                              '1) Activación Identidad',
+                              '2) Propósito Transformador',
+                              '3) Diseño Aprendizaje',
+                              '4) Activadores & Reflexión',
+                              '5) Portafolio Evidencias'
+                            ].map((step, i) => (
+                              <div key={i} className="flex items-center gap-1">
+                                <span className="w-1 h-1 rounded-full bg-primary"></span>
+                                <span>{step}</span>
+                              </div>
+                            ))}
+                          </div>
+                          <button onClick={copyPrompt} className="w-full px-2 py-2 rounded-md bg-muted text-muted-foreground text-[10px] font-medium hover:bg-muted/80 transition-colors">
+                            {copiedPrompt ? '✅ ¡Prompt copiado!' : '📋 Copiar prompt metodología'}
                           </button>
                         </div>
                       </div>
-                      <div className="p-4 bg-card">
-                        <div className="text-xs font-semibold text-primary mb-2">Metodología Certifica Global™</div>
-                        <ul className="grid grid-cols-2 gap-2 text-[12px] text-muted-foreground">
-                          {[
-                            '1) Identidad Profesional',
-                            '2) Propósito Transformador',
-                            '3) Diseño del Aprendizaje',
-                            '4) Activadores & Reflexión',
-                            '5) Portafolio de Evidencias',
-                            '6) Simulación + Feedback',
-                            '7) Evaluación Formal',
-                            '8) Posicionamiento del Perfil',
-                            '9) Liderazgo Multiplicador'
-                          ].map((step) => (
-                            <li key={step} className="flex items-center gap-2">
-                              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                              <span>{step}</span>
-                            </li>
-                          ))}
-                        </ul>
-                        <div className="mt-3 text-[11px] text-muted-foreground">
-                          Evalúa cualquier capítulo con 8 dimensiones: identidad, transformación, estrategia, técnica, emocional, transferencia laboral, ética y evaluación integral.
+
+                      {/* Social Proof Rápido */}
+                      <div className="rounded-lg border border-green-200 bg-green-50 p-3">
+                        <div className="text-xs font-semibold text-green-800 mb-2 flex items-center gap-1">
+                          <span>⭐⭐⭐⭐⭐</span>
+                          <span>4.9/5</span>
+                        </div>
+                        <div className="text-[10px] text-green-700 mb-2">
+                          "Logré mi certificación en solo 3 semanas. El proceso es muy claro y las plantillas funcionan perfecto."
+                        </div>
+                        <div className="text-[9px] text-green-600 font-medium">
+                          — María González, HR Manager
+                        </div>
+                      </div>
+
+                      {/* Urgencia */}
+                      <div className="rounded-lg border border-orange-200 bg-orange-50 p-3">
+                        <div className="text-xs font-bold text-orange-800 mb-1 flex items-center gap-1">
+                          <span>⏰</span>
+                          <span>Oferta limitada</span>
+                        </div>
+                        <div className="text-[10px] text-orange-700 mb-2">
+                          25% OFF termina en 04:31:56
+                        </div>
+                        <div className="text-[9px] text-orange-600">
+                          Código: <span className="font-bold">CERTIFICACION25</span>
                         </div>
                       </div>
                     </div>
