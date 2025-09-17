@@ -176,7 +176,7 @@ const ResourcesPage = () => {
               Acelera tu Carrera con
               <br />
               <span className="bg-gradient-to-r from-yellow-300 to-orange-400 bg-clip-text text-transparent">
-                Certificaciones CONOCER
+                Recursos CONOCER
               </span>
             </h1>
             
@@ -185,8 +185,8 @@ const ResourcesPage = () => {
             </p>
             
             <p className="text-lg text-blue-200 mb-8">
-              Recursos prácticos diseñados específicamente para profesionales de 19-45 
-              años que buscan resultados reales.
+              Recursos prácticos que te preparan para lograr tu certificación CONOCER. 
+              Diseñados específicamente para profesionales de 19-45 años que buscan resultados reales.
             </p>
 
             {/* Stats */}
@@ -211,7 +211,7 @@ const ResourcesPage = () => {
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-300 w-5 h-5" />
               <Input
                 type="text"
-                placeholder="Busca entre 1,845 estándares (código o título)"
+                placeholder="Busca recursos, ebooks, plantillas, cursos, toolkits..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-12 pr-4 py-4 bg-white/10 border-white/20 text-white placeholder:text-purple-200 rounded-xl backdrop-blur-sm"
@@ -251,10 +251,10 @@ const ResourcesPage = () => {
                     💯 COMPLETAMENTE GRATIS
                   </Badge>
                   <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                    Kit Completo de Certificación CONOCER
+                    Kit Completo de Recursos para Certificación CONOCER
                   </h2>
                   <p className="text-gray-600 mb-6">
-                    Descarga gratis nuestro kit valorado en <span className="font-bold text-purple-600">$2,490</span> con todo lo que necesitas para comenzar tu certificación profesional hoy mismo.
+                    Descarga gratis nuestro kit valorado en <span className="font-bold text-purple-600">$2,490</span> con todos los recursos que necesitas para prepararte y lograr tu certificación profesional hoy mismo.
                   </p>
                 </div>
 
