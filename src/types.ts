@@ -46,7 +46,32 @@ export interface CVAnalysisResult {
 export interface UserProgress {
   [standardCode: string]: {
     completedModules: string[];
+    lastActivity?: string;
+    streak?: number;
+    totalTimeSpent?: number;
   };
+}
+
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  category: 'completion' | 'streak' | 'speed' | 'milestone';
+  unlockedAt?: string;
+  rarity: 'common' | 'rare' | 'epic' | 'legendary';
+}
+
+export interface GamificationData {
+  level: number;
+  xp: number;
+  xpToNextLevel: number;
+  currentStreak: number;
+  longestStreak: number;
+  totalModulesCompleted: number;
+  badges: Badge[];
+  weeklyGoal: number;
+  weeklyProgress: number;
 }
 
 export interface JobOpening {

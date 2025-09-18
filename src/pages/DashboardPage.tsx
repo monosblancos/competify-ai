@@ -4,6 +4,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import StandardCard from '../componets/StandardCard';
 import { Progress } from '../components/ui/progress';
+import { GamifiedProgressDashboard } from '../components/gamification/GamifiedProgressDashboard';
+import { useGamification } from '../hooks/useGamification';
 import { BarChart3, TrendingUp, Users, Briefcase, Brain, ArrowUpRight } from 'lucide-react';
 
 interface Standard {
@@ -29,6 +31,9 @@ const DashboardPage: React.FC = () => {
   const [standards, setStandards] = useState<Standard[]>([]);
   const [jobOpenings, setJobOpenings] = useState<JobOpening[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Gamification data
+  const gamificationData = useGamification(progress);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -136,7 +141,7 @@ const DashboardPage: React.FC = () => {
         </div>
 
         {/* Two Column Layout */}
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-4 gap-8">
           {/* Left Column - Main Content */}
           <div className="lg:col-span-2 space-y-8">
             {/* Mi Plan de Carrera Profesional */}
@@ -270,8 +275,13 @@ const DashboardPage: React.FC = () => {
             </section>
           </div>
 
+          {/* Gamification Sidebar */}
+          <div className="lg:col-span-1">
+            <GamifiedProgressDashboard gamificationData={gamificationData} />
+          </div>
+
           {/* Right Column - Sidebar */}
-          <div className="space-y-6">
+          <div className="lg:col-span-1 space-y-6">
             {/* Análisis IA */}
             <section className="card-elegant p-6">
               <div className="flex items-center mb-4">
