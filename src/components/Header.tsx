@@ -253,6 +253,13 @@ Finaliza tu respuesta con:
                       >
                         Mi Biblioteca
                       </Link>
+                      <Link
+                        to="/afiliados"
+                        className="block px-4 py-2 text-sm hover:bg-muted"
+                        data-analytics="nav_user_affiliate"
+                      >
+                        Programa de Afiliados
+                      </Link>
                       <hr className="my-2 border-border" />
                       <button
                         onClick={handleLogout}

@@ -22,6 +22,7 @@ import ChatbotExploracionPage from './pages/ChatbotExploracionPage';
 import ResourcesPage from './pages/ResourcesPage';
 import ResourceDetailPage from './pages/ResourceDetailPage';
 import MyLibraryPage from './pages/MyLibraryPage';
+import AffiliatePage from './pages/AffiliatePage';
 
 const App: React.FC = () => {
   const location = useLocation();
@@ -52,6 +53,7 @@ const App: React.FC = () => {
             <Route path="/recursos" element={<ResourcesPage />} />
             <Route path="/recursos/:slug" element={<ResourceDetailPage />} />
             <Route path="/mi-biblioteca" element={<ProtectedRoute><MyLibraryPage /></ProtectedRoute>} />
+            <Route path="/afiliados" element={<ProtectedRoute><AffiliatePage /></ProtectedRoute>} />
 
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
