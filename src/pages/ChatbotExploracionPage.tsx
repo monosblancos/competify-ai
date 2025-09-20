@@ -31,7 +31,6 @@ import { useStandardsSearch } from '@/hooks/useStandardsSearch';
 import { PersonalizedProfileWizard } from '@/components/chat/PersonalizedProfileWizard';
 import { usePersonalizedRecommendations, PersonalizedRecommendation } from '@/hooks/usePersonalizedRecommendations';
 import { PersonalizedRecommendationsDisplay } from '@/components/chat/PersonalizedRecommendationsDisplay';
-import { PersonalizedRecommendationsDisplay } from '@/components/chat/PersonalizedRecommendationsDisplay';
 
 interface Message {
   id: string;
@@ -860,11 +859,6 @@ const ChatbotExploracionPage: React.FC = () => {
         </div>
       )}
 
-      {/* Exit Intent Modal */}
-      <ExitIntentModal 
-        isOpen={showExitModal}
-        onClose={() => setShowExitModal(false)}
-      />
     </div>
   );
 };
