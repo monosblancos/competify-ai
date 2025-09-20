@@ -9,3 +9,6 @@ verify_jwt = false
 
 [functions.track-affiliate-referral]
 verify_jwt = false
+
+[functions.personalized-recommendations]
+verify_jwt = false

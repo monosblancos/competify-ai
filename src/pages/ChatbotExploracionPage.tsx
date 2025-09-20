@@ -28,6 +28,10 @@ import {
 import { useToast } from '@/components/ui/use-toast';
 import { ragChatbot, RAGChatbotResponse } from '@/services/ragChatbotService';
 import { useStandardsSearch } from '@/hooks/useStandardsSearch';
+import { PersonalizedProfileWizard } from '@/components/chat/PersonalizedProfileWizard';
+import { usePersonalizedRecommendations, PersonalizedRecommendation } from '@/hooks/usePersonalizedRecommendations';
+import { PersonalizedRecommendationsDisplay } from '@/components/chat/PersonalizedRecommendationsDisplay';
+import { PersonalizedRecommendationsDisplay } from '@/components/chat/PersonalizedRecommendationsDisplay';
 
 interface Message {
   id: string;
@@ -38,6 +42,7 @@ interface Message {
   standard?: StandardCard;
   leadMagnet?: LeadMagnetOffer;
   standards?: StandardCard[];
+  personalizedRecommendations?: PersonalizedRecommendation[];
 }
 
 interface StandardCard {
@@ -78,7 +83,7 @@ const ChatbotExploracionPage: React.FC = () => {
         'Quiero certificarme en tecnología',
         '¿Qué certificación me conviene más?',
         'Busco aumentar mi salario',
-        'Analiza mi perfil profesional'
+        'Análisis personalizado de mi perfil'
       ]
     }
   ]);
@@ -94,8 +99,9 @@ const ChatbotExploracionPage: React.FC = () => {
   });
   const [showExitModal, setShowExitModal] = useState(false);
   const [relatedStandards, setRelatedStandards] = useState<any[]>([]);
+  const [showProfileWizard, setShowProfileWizard] = useState(false);
+  const [personalizedRecommendations, setPersonalizedRecommendations] = useState<PersonalizedRecommendation[]>([]);
   
-
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Exit intent detection
@@ -379,7 +385,33 @@ const ChatbotExploracionPage: React.FC = () => {
   };
 
   const handleSuggestionClick = (suggestion: string) => {
+    if (suggestion === 'Análisis personalizado de mi perfil') {
+      setShowProfileWizard(true);
+      return;
+    }
     handleSendMessage(suggestion);
+  };
+
+  const handleProfileWizardComplete = (profile: any, recommendations: PersonalizedRecommendation[]) => {
+    setShowProfileWizard(false);
+    setPersonalizedRecommendations(recommendations);
+    
+    const botMessage: Message = {
+      id: Date.now().toString(),
+      type: 'bot',
+      content: `¡Perfecto! He analizado tu perfil profesional y he generado ${recommendations.length} recomendaciones personalizadas basadas en tu experiencia, objetivos y sector deseado.\n\nEstas certificaciones están específicamente seleccionadas para maximizar tu ROI y acelerar tu crecimiento profesional:`,
+      timestamp: new Date(),
+      personalizedRecommendations: recommendations,
+      suggestions: [
+        '¿Cuál certificación me conviene más?',
+        'Quiero consultoría personalizada',
+        'Ver plan de carrera completo',
+        'Calcular ROI de cada certificación'
+      ]
+    };
+
+    setMessages(prev => [...prev, botMessage]);
+    setProgress(100);
   };
 
   // Enhanced message content rendering with standard code citations
@@ -721,6 +753,9 @@ const ChatbotExploracionPage: React.FC = () => {
                       {message.standard && <StandardDisplay standard={message.standard} />}
                       {message.standards && <StandardsListDisplay standards={message.standards} />}
                       {message.leadMagnet && <LeadMagnetDisplay offer={message.leadMagnet} />}
+                      {message.personalizedRecommendations && 
+                        <PersonalizedRecommendationsDisplay recommendations={message.personalizedRecommendations} />
+                      }
                       
                       {message.suggestions && (
                         <div className="mt-4 space-y-2">
@@ -814,6 +849,22 @@ const ChatbotExploracionPage: React.FC = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Profile Wizard Modal */}
+      {showProfileWizard && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <PersonalizedProfileWizard
+            onComplete={handleProfileWizardComplete}
+            onCancel={() => setShowProfileWizard(false)}
+          />
+        </div>
+      )}
+
+      {/* Exit Intent Modal */}
+      <ExitIntentModal 
+        isOpen={showExitModal}
+        onClose={() => setShowExitModal(false)}
+      />
     </div>
   );
 };
