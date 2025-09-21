@@ -23,6 +23,8 @@ import ResourcesPage from './pages/ResourcesPage';
 import ResourceDetailPage from './pages/ResourceDetailPage';
 import MyLibraryPage from './pages/MyLibraryPage';
 import AffiliatePage from './pages/AffiliatePage';
+import CommunityPage from './pages/CommunityPage';
+import NetworkingPage from './pages/NetworkingPage';
 
 const App: React.FC = () => {
   const location = useLocation();
