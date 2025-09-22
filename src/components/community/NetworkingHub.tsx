@@ -23,6 +23,33 @@ import {
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 
+// Helper functions moved outside the component
+const getConnectionStatusIcon = (status: string) => {
+  switch (status) {
+    case 'pending':
+      return <Clock className="w-4 h-4 text-yellow-500" />;
+    case 'accepted':
+      return <CheckCircle className="w-4 h-4 text-green-500" />;
+    case 'rejected':
+      return <XCircle className="w-4 h-4 text-red-500" />;
+    default:
+      return <Users className="w-4 h-4 text-muted-foreground" />;
+  }
+};
+
+const getStatusLabel = (status: string) => {
+  switch (status) {
+    case 'pending':
+      return 'Pendiente';
+    case 'accepted':
+      return 'Conectado';
+    case 'rejected':
+      return 'Rechazado';
+    default:
+      return 'Sin conexión';
+  }
+};
+
 export const NetworkingHub: React.FC = () => {
   const { 
     connections, 
@@ -36,10 +63,6 @@ export const NetworkingHub: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('suggested');
 
-  // Filter connections by status
-  const pendingConnections = connections.filter(conn => conn.status === 'pending');
-  const acceptedConnections = connections.filter(conn => conn.status === 'accepted');
-
   // Filter suggested users based on search
   const filteredSuggestions = suggestedUsers.filter(user =>
     user.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -47,31 +70,9 @@ export const NetworkingHub: React.FC = () => {
     user.education_level?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const getConnectionStatusIcon = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return <Clock className="w-4 h-4 text-yellow-500" />;
-      case 'accepted':
-        return <CheckCircle className="w-4 h-4 text-green-500" />;
-      case 'rejected':
-        return <XCircle className="w-4 h-4 text-red-500" />;
-      default:
-        return <Users className="w-4 h-4 text-muted-foreground" />;
-    }
-  };
-
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return 'Pendiente';
-      case 'accepted':
-        return 'Conectado';
-      case 'rejected':
-        return 'Rechazado';
-      default:
-        return 'Sin conexión';
-    }
-  };
+  // Filter connections by status
+  const pendingConnections = connections.filter(conn => conn.status === 'pending');
+  const acceptedConnections = connections.filter(conn => conn.status === 'accepted');
 
   if (loading) {
     return (
@@ -220,13 +221,14 @@ export const NetworkingHub: React.FC = () => {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {pendingConnections.map(connection => {
                 const user = connection.requester_profile || connection.addressee_profile;
-                const isIncoming = connection.addressee_id === (user as any)?.id;
+                const userId = connection.requester_id === (user as any)?.id ? connection.addressee_id : connection.requester_id;
+                const isIncoming = connection.addressee_id !== userId;
                 
                 return (
                   <ConnectionCard
                     key={connection.id}
                     connection={connection}
-                    user={{...user, id: user?.id || ''} as UserProfile}
+                    user={{...user, id: userId} as UserProfile}
                     isIncoming={isIncoming}
                     onAccept={() => respondToConnection(connection.id, 'accepted')}
                     onReject={() => respondToConnection(connection.id, 'rejected')}
@@ -249,11 +251,12 @@ export const NetworkingHub: React.FC = () => {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {acceptedConnections.map(connection => {
                 const user = connection.requester_profile || connection.addressee_profile;
+                const userId = connection.requester_id === (user as any)?.id ? connection.addressee_id : connection.requester_id;
                 return (
                   <UserCard
                     key={connection.id}
-                    user={{...user, id: user?.id || ''} as UserProfile}
-                    onMessage={() => fetchMessages(user?.id || '')}
+                    user={{...user, id: userId} as UserProfile}
+                    onMessage={() => fetchMessages(userId)}
                     connectionDate={connection.created_at}
                     showActions={false}
                     isConnected={true}

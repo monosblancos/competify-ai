@@ -49,10 +49,12 @@ export const useCommunity = () => {
       const postsWithLikes = data?.map(post => ({
         ...post,
         user_profile: post.user_profiles?.[0] || { full_name: '', email: '' },
-        is_liked: post.post_likes?.some(like => like.user_id === (user as any)?.id) || false
+        is_liked: post.post_likes?.some(like => like.user_id === (user as any)?.id) || false,
+        post_likes: undefined,
+        user_profiles: undefined
       })) || [];
 
-      setPosts(postsWithLikes);
+      setPosts(postsWithLikes as CommunityPost[]);
     } catch (error) {
       console.error('Error fetching posts:', error);
       toast.error('Error al cargar los posts');
@@ -92,8 +94,9 @@ export const useCommunity = () => {
       const newPost = {
         ...data,
         user_profile: data.user_profiles?.[0] || { full_name: '', email: '' },
-        is_liked: false
-      };
+        is_liked: false,
+        user_profiles: undefined
+      } as CommunityPost;
 
       setPosts(prev => [newPost, ...prev]);
       toast.success('Post creado exitosamente');
@@ -176,8 +179,10 @@ export const useCommunity = () => {
       return data?.map(comment => ({
         ...comment,
         user_profile: comment.user_profiles?.[0] || { full_name: '', email: '' },
-        is_liked: comment.comment_likes?.some(like => like.user_id === (user as any)?.id) || false
-      })) || [];
+        is_liked: comment.comment_likes?.some(like => like.user_id === (user as any)?.id) || false,
+        user_profiles: undefined,
+        comment_likes: undefined
+      })) as CommunityComment[] || [];
     } catch (error) {
       console.error('Error fetching comments:', error);
       return [];
@@ -211,8 +216,9 @@ export const useCommunity = () => {
       const newComment = {
         ...data,
         user_profile: data.user_profiles?.[0] || { full_name: '', email: '' },
-        is_liked: false
-      };
+        is_liked: false,
+        user_profiles: undefined
+      } as CommunityComment;
 
       // Update comments count in posts
       setPosts(prev => prev.map(p => 

@@ -49,9 +49,7 @@ export const PostCard: React.FC<PostCardProps> = ({
     setSubmittingComment(true);
     const comment = await createComment(post.id, newComment.trim());
     if (comment) {
-      if (comment) {
-        setComments(prev => [...prev, comment]);
-      }
+      setComments(prev => [...prev, comment as CommunityComment]);
       setNewComment('');
       onCommentAdded?.();
     }

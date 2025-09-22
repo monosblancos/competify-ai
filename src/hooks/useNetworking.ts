@@ -43,8 +43,10 @@ export const useNetworking = () => {
       const connectionsWithProfiles = data?.map(conn => ({
         ...conn,
         requester_profile: conn.requester_profiles?.[0] || { full_name: '', email: '' },
-        addressee_profile: conn.addressee_profiles?.[0] || { full_name: '', email: '' }
-      })) || [];
+        addressee_profile: conn.addressee_profiles?.[0] || { full_name: '', email: '' },
+        requester_profiles: undefined,
+        addressee_profiles: undefined
+      })) as UserConnection[] || [];
 
       setConnections(connectionsWithProfiles);
     } catch (error) {
@@ -169,8 +171,10 @@ export const useNetworking = () => {
       const messagesWithProfiles = data?.map(msg => ({
         ...msg,
         sender_profile: msg.sender_profiles?.[0] || { full_name: '', email: '' },
-        recipient_profile: msg.recipient_profiles?.[0] || { full_name: '', email: '' }
-      })) || [];
+        recipient_profile: msg.recipient_profiles?.[0] || { full_name: '', email: '' },
+        sender_profiles: undefined,
+        recipient_profiles: undefined
+      })) as DirectMessage[] || [];
 
       setMessages(messagesWithProfiles);
       setConversationUser(otherUserId);
@@ -222,8 +226,10 @@ export const useNetworking = () => {
       const newMessage = {
         ...data,
         sender_profile: data.sender_profiles?.[0] || { full_name: '', email: '' },
-        recipient_profile: data.recipient_profiles?.[0] || { full_name: '', email: '' }
-      };
+        recipient_profile: data.recipient_profiles?.[0] || { full_name: '', email: '' },
+        sender_profiles: undefined,
+        recipient_profiles: undefined
+      } as DirectMessage;
 
       setMessages(prev => [...prev, newMessage]);
     } catch (error) {
