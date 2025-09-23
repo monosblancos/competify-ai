@@ -703,18 +703,56 @@ Finaliza tu respuesta con:
                 </div>
               </MegaMenu>
 
+              <NavLink
+                to="/estandares"
+                className={({ isActive }) =>
+                  `text-sm hover:text-foreground transition-colors ${
+                    isActive ? 'text-primary font-medium' : 'text-muted-foreground'
+                  }`
+                }
+                data-analytics="nav_estandares_click"
+              >
+                Estándares
+              </NavLink>
+
               {user && (
-                <NavLink
-                  to="/mis-cursos"
-                  className={({ isActive }) =>
-                    `text-sm hover:text-foreground transition-colors ${
-                      isActive ? 'text-primary font-medium' : 'text-muted-foreground'
-                    }`
-                  }
-                  data-analytics="nav_mis_cursos_click"
-                >
-                  Mis Cursos
-                </NavLink>
+                <>
+                  <NavLink
+                    to="/comunidad"
+                    className={({ isActive }) =>
+                      `text-sm hover:text-foreground transition-colors ${
+                        isActive ? 'text-primary font-medium' : 'text-muted-foreground'
+                      }`
+                    }
+                    data-analytics="nav_comunidad_click"
+                  >
+                    Comunidad
+                  </NavLink>
+                  
+                  <NavLink
+                    to="/networking"
+                    className={({ isActive }) =>
+                      `text-sm hover:text-foreground transition-colors ${
+                        isActive ? 'text-primary font-medium' : 'text-muted-foreground'
+                      }`
+                    }
+                    data-analytics="nav_networking_click"
+                  >
+                    Networking
+                  </NavLink>
+
+                  <NavLink
+                    to="/mis-cursos"
+                    className={({ isActive }) =>
+                      `text-sm hover:text-foreground transition-colors ${
+                        isActive ? 'text-primary font-medium' : 'text-muted-foreground'
+                      }`
+                    }
+                    data-analytics="nav_mis_cursos_click"
+                  >
+                    Mis Cursos
+                  </NavLink>
+                </>
               )}
             </div>
           </div>
@@ -830,6 +868,28 @@ Finaliza tu respuesta con:
                     </Link>
                   </div>
                 </div>
+
+                {user && (
+                  <div>
+                    <h3 className="text-xs font-semibold uppercase text-primary mb-2">Comunidad</h3>
+                    <div className="space-y-1">
+                      <Link
+                        to="/comunidad"
+                        className="block py-2 text-sm hover:text-primary"
+                        onClick={() => setMobileOpen(false)}
+                      >
+                        Feed de la comunidad
+                      </Link>
+                      <Link
+                        to="/networking"
+                        className="block py-2 text-sm hover:text-primary"
+                        onClick={() => setMobileOpen(false)}
+                      >
+                        Networking profesional
+                      </Link>
+                    </div>
+                  </div>
+                )}
 
                 <div>
                   <h3 className="text-xs font-semibold uppercase text-primary mb-2">Programas</h3>

@@ -56,6 +56,8 @@ const App: React.FC = () => {
             <Route path="/recursos/:slug" element={<ResourceDetailPage />} />
             <Route path="/mi-biblioteca" element={<ProtectedRoute><MyLibraryPage /></ProtectedRoute>} />
             <Route path="/afiliados" element={<ProtectedRoute><AffiliatePage /></ProtectedRoute>} />
+            <Route path="/comunidad" element={<ProtectedRoute><CommunityPage /></ProtectedRoute>} />
+            <Route path="/networking" element={<ProtectedRoute><NetworkingPage /></ProtectedRoute>} />
 
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
