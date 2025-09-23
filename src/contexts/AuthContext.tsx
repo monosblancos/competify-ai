@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { User as SupabaseUser, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import type { AuthContextType, CVAnalysisResult, UserProgress } from '../types';
+import { createDemoUser, getDemoAnalysis, getDemoProgress, isDemoUser } from '../services/demoService';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -105,28 +106,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (email: string, password: string) => {
     // Demo mode - bypass authentication for demo users
-    if (email === 'demo@certificaglobal.mx' || email === 'demo') {
-      const demoUser: any = {
-        id: 'demo-user',
-        email: 'demo@certificaglobal.mx',
-        user_metadata: { name: 'Usuario Demo' }
-      };
+    if (isDemoUser(email)) {
+      const demoUser = createDemoUser();
       
-      setUser(demoUser);
+      setUser(demoUser as any);
       setSession({ user: demoUser } as any);
       setIsLoading(false);
       
       // Set demo data for CV analysis and progress
-      setLastAnalysis({
-        strengths: ['Liderazgo de equipos', 'Gestión de proyectos', 'Comunicación efectiva'],
-        opportunities: ['Análisis financiero', 'Certificación en competencias digitales'],
-        recommendedStandard: { code: 'EC0301', title: 'Gestión de Proyectos' }
-      });
-      
-      setProgress({
-        'EC0301': { completedModules: ['modulo1'] },
-        'EC0366': { completedModules: [] }
-      });
+      setLastAnalysis(getDemoAnalysis());
+      setProgress(getDemoProgress());
       
       return { error: null };
     }
