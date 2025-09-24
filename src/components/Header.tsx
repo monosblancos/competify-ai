@@ -542,18 +542,131 @@ Finaliza tu respuesta con:
                  </div>
               </MegaMenu>
 
-              {/* Other Menu Items */}
-              <NavLink
-                to="/estandares"
-                className={({ isActive }) =>
-                  `text-sm hover:text-foreground transition-colors ${
-                    isActive ? 'text-primary font-medium' : 'text-muted-foreground'
-                  }`
-                }
-                data-analytics="nav_estandares_click"
+              {/* Estándares */}
+              <MegaMenu
+                trigger="Estándares"
+                isActive={activeMenu === "estandares"}
+                onToggle={() => setActiveMenu(activeMenu === "estandares" ? null : "estandares")}
+                analytics="nav_estandares_click"
               >
-                Estándares
-              </NavLink>
+                <div className="p-6 w-[900px]">
+                  <div className="grid grid-cols-4 gap-6">
+                    {/* Columna 1: Búsqueda rápida */}
+                    <div>
+                      <div className="mb-3 text-xs font-semibold uppercase text-primary">
+                        Búsqueda rápida
+                      </div>
+                      <div className="space-y-2">
+                        <div className="p-3 rounded-lg border border-border hover:bg-muted transition-colors">
+                          <div className="text-sm font-medium mb-1">Por código</div>
+                          <div className="text-xs text-muted-foreground">EC0217, EC0301, etc.</div>
+                        </div>
+                        <div className="p-3 rounded-lg border border-border hover:bg-muted transition-colors">
+                          <div className="text-sm font-medium mb-1">Por categoría</div>
+                          <div className="text-xs text-muted-foreground">Educación, TI, RRHH</div>
+                        </div>
+                        <Link
+                          to="/estandares"
+                          className="block w-full p-2 text-center text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                        >
+                          Explorar todos
+                        </Link>
+                      </div>
+                    </div>
+
+                    {/* Columna 2: Categorías principales */}
+                    <div>
+                      <div className="mb-3 text-xs font-semibold uppercase text-primary">
+                        Categorías principales
+                      </div>
+                      <div className="space-y-2">
+                        {[
+                          { name: "Educación y Formación", count: "487", popular: true },
+                          { name: "Tecnologías de la Información", count: "324", popular: true },
+                          { name: "Recursos Humanos", count: "256", popular: false },
+                          { name: "Evaluación y Certificación", count: "189", popular: false },
+                          { name: "Consultoría", count: "143", popular: false }
+                        ].map((category) => (
+                          <Link
+                            key={category.name}
+                            to={`/estandares?categoria=${encodeURIComponent(category.name)}`}
+                            className="block p-2 rounded-lg hover:bg-muted text-sm transition-colors"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="font-medium">{category.name}</div>
+                              {category.popular && (
+                                <span className="bg-green-100 text-green-800 text-[10px] px-2 py-0.5 rounded-full">Popular</span>
+                              )}
+                            </div>
+                            <div className="text-xs text-muted-foreground">{category.count} estándares</div>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Columna 3: Estándares más demandados */}
+                    <div>
+                      <div className="mb-3 text-xs font-semibold uppercase text-primary flex items-center gap-2">
+                        <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                        Más demandados
+                      </div>
+                      <div className="space-y-2">
+                        {[
+                          { code: "EC0217", title: "Impartición de cursos", demand: "🔥 Alta", students: "2,847" },
+                          { code: "EC0366", title: "Desarrollo de software", demand: "🔥 Alta", students: "3,241" },
+                          { code: "EC0301", title: "Diseño curricular", demand: "📈 Creciente", students: "1,923" },
+                          { code: "EC0076", title: "Evaluación de competencias", demand: "📊 Estable", students: "1,456" }
+                        ].map((standard) => (
+                          <Link
+                            key={standard.code}
+                            to={`/estandares/${standard.code}`}
+                            className="block p-2 rounded-lg border border-border hover:bg-muted transition-colors"
+                          >
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-xs font-bold bg-primary text-primary-foreground px-2 py-0.5 rounded">{standard.code}</span>
+                              <span className="text-[10px] text-muted-foreground">{standard.demand}</span>
+                            </div>
+                            <div className="text-xs font-medium text-foreground mb-1">{standard.title}</div>
+                            <div className="text-[10px] text-muted-foreground">{standard.students} estudiantes activos</div>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Columna 4: Herramientas y recursos */}
+                    <div>
+                      <div className="mb-3 text-xs font-semibold uppercase text-primary">
+                        Herramientas
+                      </div>
+                      <div className="space-y-2">
+                        <button
+                          onClick={copyPrompt}
+                          className="w-full p-3 rounded-lg border border-border hover:bg-muted text-left transition-colors"
+                        >
+                          <div className="text-sm font-medium mb-1 flex items-center gap-2">
+                            Prompt para Claude
+                            {copiedPrompt && <span className="text-green-500 text-xs">✓ Copiado</span>}
+                          </div>
+                          <div className="text-xs text-muted-foreground">Análisis con IA especializada</div>
+                        </button>
+                        
+                        <Link
+                          to="/diagnostico"
+                          className="block p-3 rounded-lg border border-border hover:bg-muted transition-colors"
+                        >
+                          <div className="text-sm font-medium mb-1">Diagnóstico CV</div>
+                          <div className="text-xs text-muted-foreground">Encuentra tu ruta de certificación</div>
+                        </Link>
+
+                        <div className="p-3 rounded-lg bg-muted/50">
+                          <div className="text-sm font-medium mb-1">📊 Base de datos</div>
+                          <div className="text-xs text-muted-foreground">1,845 estándares CONOCER actualizados</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </MegaMenu>
 
               <NavLink
                 to="/empresa"
