@@ -157,6 +157,30 @@ export type Database = {
         }
         Relationships: []
       }
+      business_chat_sessions: {
+        Row: {
+          company_info: Json | null
+          created_at: string
+          id: string
+          messages: Json
+          updated_at: string
+        }
+        Insert: {
+          company_info?: Json | null
+          created_at?: string
+          id?: string
+          messages?: Json
+          updated_at?: string
+        }
+        Update: {
+          company_info?: Json | null
+          created_at?: string
+          id?: string
+          messages?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       chat_sessions: {
         Row: {
           created_at: string | null

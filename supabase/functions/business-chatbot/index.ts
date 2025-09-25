@@ -69,7 +69,7 @@ serve(async (req) => {
 4. CREAR URGENCIA mostrando el ROI y ventajas competitivas
 
 CONTEXTO DE ESTÁNDARES DISPONIBLES:
-${standards?.map(s => `- ${s.code}: ${s.title} (${s.category})`).join('\n') || 'No hay estándares específicos encontrados'}
+${standards?.map((s: any) => `- ${s.code}: ${s.title} (${s.category})`).join('\n') || 'No hay estándares específicos encontrados'}
 
 INFORMACIÓN DE LA EMPRESA:
 ${session.company_info ? `
@@ -148,7 +148,7 @@ Responde de manera profesional, práctica y orientada a resultados empresariales
     console.error('Error in business chatbot:', error);
     return new Response(JSON.stringify({ 
       error: 'Error al procesar la consulta empresarial',
-      details: error.message 
+      details: error instanceof Error ? error.message : 'Unknown error'
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

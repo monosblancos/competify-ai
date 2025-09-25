@@ -4,6 +4,7 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Building2, Users, Award, TrendingUp, CheckCircle, Target, Zap, BarChart3 } from 'lucide-react';
+import BusinessChatbot from '../components/business/BusinessChatbot';
 
 const EmpresasPage: React.FC = () => {
   const benefits = [
@@ -255,6 +256,14 @@ const EmpresasPage: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Business Chatbot */}
+      <BusinessChatbot 
+        companyInfo={{
+          industry: "Sector empresarial general",
+          size: "Empresa visitante"
+        }}
+      />
     </div>
   );
 };
