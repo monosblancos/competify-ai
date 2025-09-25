@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
-import { Building2, Users, Award, TrendingUp, CheckCircle, Target, Zap, BarChart3 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { Building2, Users, Award, TrendingUp, CheckCircle, Target, Zap, BarChart3, Search } from 'lucide-react';
 import BusinessChatbot from '../components/business/BusinessChatbot';
+import { CandidateMatchingDashboard } from '../components/business/CandidateMatchingDashboard';
 
 const EmpresasPage: React.FC = () => {
   const benefits = [
@@ -87,8 +89,14 @@ const EmpresasPage: React.FC = () => {
               garantizando competencias validadas y productividad comprobada.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-gradient-primary text-white">
-                Solicitar Consultoría Gratuita
+              <Button 
+                size="lg" 
+                className="bg-gradient-primary text-white"
+                onClick={() => {
+                  document.getElementById('main-tabs')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+              >
+                Encontrar Talento Certificado
               </Button>
               <Button variant="outline" size="lg">
                 Ver Casos de Éxito
@@ -117,120 +125,132 @@ const EmpresasPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Benefits Section */}
+      {/* Main Content Tabs */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-6">
-              ¿Por qué elegir talento certificado?
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Las certificaciones CONOCER garantizan que tus empleados tienen las competencias 
-              exactas que tu empresa necesita para crecer.
-            </p>
-          </div>
+          <Tabs defaultValue="search" className="w-full" id="main-tabs">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="search" className="flex items-center gap-2">
+                <Search className="h-4 w-4" />
+                Buscar Talento
+              </TabsTrigger>
+              <TabsTrigger value="benefits">Beneficios</TabsTrigger>
+              <TabsTrigger value="services">Servicios</TabsTrigger>
+              <TabsTrigger value="testimonials">Testimonios</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="search" className="mt-8">
+              <CandidateMatchingDashboard />
+            </TabsContent>
+            
+            <TabsContent value="benefits" className="mt-8">
+              <div className="text-center mb-16">
+                <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-6">
+                  ¿Por qué elegir talento certificado?
+                </h2>
+                <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+                  Las certificaciones CONOCER garantizan que tus empleados tienen las competencias 
+                  exactas que tu empresa necesita para crecer.
+                </p>
+              </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {benefits.map((benefit, index) => (
-              <Card key={index} className="text-center hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="mx-auto mb-4 p-3 bg-primary/10 rounded-full w-fit">
-                    {benefit.icon}
-                  </div>
-                  <CardTitle className="text-xl">{benefit.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-base">
-                    {benefit.description}
-                  </CardDescription>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                {benefits.map((benefit, index) => (
+                  <Card key={index} className="text-center hover:shadow-lg transition-shadow">
+                    <CardHeader>
+                      <div className="mx-auto mb-4 p-3 bg-primary/10 rounded-full w-fit">
+                        {benefit.icon}
+                      </div>
+                      <CardTitle className="text-xl">{benefit.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <CardDescription className="text-base">
+                        {benefit.description}
+                      </CardDescription>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="services" className="mt-8">
+              <div className="text-center mb-16">
+                <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-6">
+                  Nuestros Servicios Empresariales
+                </h2>
+                <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+                  Soluciones integrales para desarrollar y certificar el talento de tu organización.
+                </p>
+              </div>
 
-      {/* Services Section */}
-      <section className="py-20 bg-muted/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-6">
-              Nuestros Servicios Empresariales
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Soluciones integrales para desarrollar y certificar el talento de tu organización.
-            </p>
-          </div>
+              <div className="grid md:grid-cols-3 gap-8">
+                {services.map((service, index) => (
+                  <Card key={index} className="relative">
+                    <CardHeader>
+                      <CardTitle className="text-xl">{service.title}</CardTitle>
+                      <CardDescription className="text-base">
+                        {service.description}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <ul className="space-y-2">
+                        {service.features.map((feature, featureIndex) => (
+                          <li key={featureIndex} className="flex items-center text-sm">
+                            <CheckCircle className="h-4 w-4 text-primary mr-2 flex-shrink-0" />
+                            {feature}
+                          </li>
+                        ))}
+                      </ul>
+                      <div className="pt-4 border-t">
+                        <p className="text-sm font-semibold text-primary">
+                          {service.price}
+                        </p>
+                      </div>
+                      <Button className="w-full" variant="outline">
+                        Más Información
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="testimonials" className="mt-8">
+              <div className="text-center mb-16">
+                <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-6">
+                  Lo que dicen nuestros clientes
+                </h2>
+              </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {services.map((service, index) => (
-              <Card key={index} className="relative">
-                <CardHeader>
-                  <CardTitle className="text-xl">{service.title}</CardTitle>
-                  <CardDescription className="text-base">
-                    {service.description}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <ul className="space-y-2">
-                    {service.features.map((feature, featureIndex) => (
-                      <li key={featureIndex} className="flex items-center text-sm">
-                        <CheckCircle className="h-4 w-4 text-primary mr-2 flex-shrink-0" />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="pt-4 border-t">
-                    <p className="text-sm font-semibold text-primary">
-                      {service.price}
-                    </p>
-                  </div>
-                  <Button className="w-full" variant="outline">
-                    Más Información
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-6">
-              Lo que dicen nuestros clientes
-            </h2>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <Card key={index} className="p-6">
-                <CardContent className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline">{testimonial.industry}</Badge>
-                  </div>
-                  <blockquote className="text-lg italic text-muted-foreground">
-                    "{testimonial.testimonial}"
-                  </blockquote>
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center">
-                      <span className="text-primary font-semibold">
-                        {testimonial.name.split(' ').map(n => n[0]).join('')}
-                      </span>
-                    </div>
-                    <div>
-                      <p className="font-semibold">{testimonial.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {testimonial.position}, {testimonial.company}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+              <div className="grid md:grid-cols-2 gap-8">
+                {testimonials.map((testimonial, index) => (
+                  <Card key={index} className="p-6">
+                    <CardContent className="space-y-4">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline">{testimonial.industry}</Badge>
+                      </div>
+                      <blockquote className="text-lg italic text-muted-foreground">
+                        "{testimonial.testimonial}"
+                      </blockquote>
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center">
+                          <span className="text-primary font-semibold">
+                            {testimonial.name.split(' ').map(n => n[0]).join('')}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="font-semibold">{testimonial.name}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {testimonial.position}, {testimonial.company}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </section>
 
