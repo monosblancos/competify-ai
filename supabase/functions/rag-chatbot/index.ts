@@ -104,7 +104,7 @@ serve(async (req) => {
           if (!vectorError && vectorResults && vectorResults.length > 0) {
             // Merge results, avoiding duplicates
             const existingCodes = new Set(similarStandards.map(s => s.code));
-            const newResults = vectorResults.filter(s => !existingCodes.has(s.code));
+            const newResults = vectorResults.filter((s: any) => !existingCodes.has(s.code));
             similarStandards = [...similarStandards, ...newResults];
             console.log(`Added ${newResults.length} more standards via vector search`);
           }
@@ -277,7 +277,7 @@ ${message}
   } catch (error) {
     console.error('Error in rag-chatbot function:', error);
     return new Response(JSON.stringify({ 
-      error: error.message,
+      error: error instanceof Error ? error.message : 'Unknown error',
       message: 'Lo siento, hubo un error procesando tu consulta. Por favor intenta nuevamente.'
     }), {
       status: 500,

@@ -135,8 +135,8 @@ Responde solo con JSON válido:
     
     return new Response(
       JSON.stringify({ 
-        error: 'Error analyzing CV text: ' + error.message,
-        details: error.toString()
+        error: 'Error analyzing CV text: ' + (error instanceof Error ? error.message : 'Unknown error'),
+        details: error instanceof Error ? error.toString() : String(error)
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

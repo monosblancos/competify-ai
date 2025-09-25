@@ -118,7 +118,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in generate-embeddings function:', error);
     return new Response(JSON.stringify({ 
-      error: error.message,
+      error: error instanceof Error ? error.message : 'Unknown error',
       details: 'Error generating embeddings for standards'
     }), {
       status: 500,

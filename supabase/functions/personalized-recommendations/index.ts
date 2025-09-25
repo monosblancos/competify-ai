@@ -180,7 +180,7 @@ Responde ÚNICAMENTE en formato JSON válido:
   } catch (error) {
     console.error('Error in personalized-recommendations function:', error);
     return new Response(JSON.stringify({ 
-      error: error.message,
+      error: error instanceof Error ? error.message : 'Unknown error',
       recommendations: []
     }), {
       status: 500,

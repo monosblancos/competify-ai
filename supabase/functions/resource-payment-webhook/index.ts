@@ -87,10 +87,16 @@ serve(async (req) => {
           });
 
         // Update product purchase count
+        const { data: currentProduct } = await supabaseService
+          .from('resource_products')
+          .select('total_purchases')
+          .eq('id', item.product_id)
+          .single();
+        
         await supabaseService
           .from('resource_products')
           .update({
-            total_purchases: sql`total_purchases + 1`
+            total_purchases: (currentProduct?.total_purchases || 0) + 1
           })
           .eq('id', item.product_id);
 
