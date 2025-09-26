@@ -4,10 +4,11 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-import { Building2, Users, Award, TrendingUp, CheckCircle, Target, Zap, BarChart3, Search, Activity } from 'lucide-react';
+import { Building2, Users, Award, TrendingUp, CheckCircle, Target, Zap, BarChart3, Search, Activity, Calculator } from 'lucide-react';
 import BusinessChatbot from '../components/business/BusinessChatbot';
 import { CandidateMatchingDashboard } from '../components/business/CandidateMatchingDashboard';
 import { LaborMarketAnalysis } from '../components/business/LaborMarketAnalysis';
+import { ROICalculator } from '../components/business/ROICalculator';
 
 const EmpresasPage: React.FC = () => {
   const benefits = [
@@ -130,7 +131,7 @@ const EmpresasPage: React.FC = () => {
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Tabs defaultValue="search" className="w-full" id="main-tabs">
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="search" className="flex items-center gap-2">
                 <Search className="h-4 w-4" />
                 Buscar Talento
@@ -138,6 +139,10 @@ const EmpresasPage: React.FC = () => {
               <TabsTrigger value="market" className="flex items-center gap-2">
                 <Activity className="h-4 w-4" />
                 Análisis de Mercado
+              </TabsTrigger>
+              <TabsTrigger value="roi" className="flex items-center gap-2">
+                <Calculator className="h-4 w-4" />
+                Calculadora ROI
               </TabsTrigger>
               <TabsTrigger value="benefits">Beneficios</TabsTrigger>
               <TabsTrigger value="services">Servicios</TabsTrigger>
@@ -150,6 +155,10 @@ const EmpresasPage: React.FC = () => {
             
             <TabsContent value="market" className="mt-8">
               <LaborMarketAnalysis />
+            </TabsContent>
+            
+            <TabsContent value="roi" className="mt-8">
+              <ROICalculator />
             </TabsContent>
             
             <TabsContent value="benefits" className="mt-8">
