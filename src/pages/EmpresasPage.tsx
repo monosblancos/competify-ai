@@ -4,11 +4,12 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-import { Building2, Users, Award, TrendingUp, CheckCircle, Target, Zap, BarChart3, Search, Activity, Calculator } from 'lucide-react';
+import { Building2, Users, Award, TrendingUp, CheckCircle, Target, Zap, BarChart3, Search, Activity, Calculator, Monitor } from 'lucide-react';
 import BusinessChatbot from '../components/business/BusinessChatbot';
 import { CandidateMatchingDashboard } from '../components/business/CandidateMatchingDashboard';
 import { LaborMarketAnalysis } from '../components/business/LaborMarketAnalysis';
 import { ROICalculator } from '../components/business/ROICalculator';
+import { BusinessDashboard } from '../components/business/BusinessDashboard';
 
 const EmpresasPage: React.FC = () => {
   const benefits = [
@@ -130,8 +131,12 @@ const EmpresasPage: React.FC = () => {
       {/* Main Content Tabs */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Tabs defaultValue="search" className="w-full" id="main-tabs">
-            <TabsList className="grid w-full grid-cols-6">
+          <Tabs defaultValue="dashboard" className="w-full" id="main-tabs">
+            <TabsList className="grid w-full grid-cols-7">
+              <TabsTrigger value="dashboard" className="flex items-center gap-2">
+                <Monitor className="h-4 w-4" />
+                Dashboard
+              </TabsTrigger>
               <TabsTrigger value="search" className="flex items-center gap-2">
                 <Search className="h-4 w-4" />
                 Buscar Talento
@@ -149,6 +154,10 @@ const EmpresasPage: React.FC = () => {
               <TabsTrigger value="testimonials">Testimonios</TabsTrigger>
             </TabsList>
             
+            <TabsContent value="dashboard" className="mt-8">
+              <BusinessDashboard />
+            </TabsContent>
+
             <TabsContent value="search" className="mt-8">
               <CandidateMatchingDashboard />
             </TabsContent>
