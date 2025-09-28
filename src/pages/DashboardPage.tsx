@@ -99,6 +99,36 @@ const DashboardPage: React.FC = () => {
           <p className="text-xl text-muted-foreground">
             Continuemos construyendo tu perfil profesional
           </p>
+          
+          {/* Guided Flow CTA - Show if user has completed analysis */}
+          {lastAnalysis && (
+            <div className="mt-6 bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20 rounded-xl p-6">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Brain className="w-6 h-6 text-primary" />
+                    <h3 className="text-xl font-bold text-foreground">¡Análisis Completado!</h3>
+                  </div>
+                  <p className="text-muted-foreground mb-4">
+                    Tienes un análisis personalizado listo. Te guiamos paso a paso para convertir 
+                    estos insights en tu próxima certificación profesional.
+                  </p>
+                  <Link 
+                    to="/guided-flow" 
+                    className="inline-flex items-center gap-2 btn-hero px-6 py-2"
+                  >
+                    Continuar mi Plan Personalizado
+                    <ArrowUpRight className="w-4 h-4" />
+                  </Link>
+                </div>
+                <div className="hidden md:block">
+                  <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center">
+                    <TrendingUp className="w-8 h-8 text-primary" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Quick Actions */}

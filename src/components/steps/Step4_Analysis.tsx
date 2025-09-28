@@ -353,13 +353,20 @@ const Step4_Analysis: React.FC<Step4Props> = ({ data, onPrev, onComplete }) => {
           </button>
           
           <button
-            onClick={onComplete}
+            onClick={() => window.location.href = '/guided-flow'}
             className="btn-hero px-8"
           >
-            Ir a mi Dashboard
+            Continuar con Recomendaciones
             <svg className="w-4 h-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
             </svg>
+          </button>
+          
+          <button
+            onClick={onComplete}
+            className="btn-secondary px-8"
+          >
+            Ir a mi Dashboard
           </button>
         </div>
       </div>

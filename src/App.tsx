@@ -26,6 +26,7 @@ import AffiliatePage from './pages/AffiliatePage';
 import CommunityPage from './pages/CommunityPage';
 import NetworkingPage from './pages/NetworkingPage';
 import EmpresasPage from './pages/EmpresasPage';
+import GuidedFlowPage from './pages/GuidedFlowPage';
 
 const App: React.FC = () => {
   const location = useLocation();
@@ -60,6 +61,7 @@ const App: React.FC = () => {
             <Route path="/comunidad" element={<ProtectedRoute><CommunityPage /></ProtectedRoute>} />
             <Route path="/networking" element={<ProtectedRoute><NetworkingPage /></ProtectedRoute>} />
             <Route path="/empresa" element={<EmpresasPage />} />
+            <Route path="/guided-flow" element={<ProtectedRoute><GuidedFlowPage /></ProtectedRoute>} />
 
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
