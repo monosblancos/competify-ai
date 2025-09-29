@@ -14,12 +14,15 @@ import {
   Bell,
   Building2,
   Target,
-  Calendar
+  Calendar,
+  Settings
 } from 'lucide-react';
 import { LaborMarketService } from '@/services/laborMarketService';
 import { CandidateMatchingService } from '@/services/candidateMatchingService';
 import type { LaborMarketOverview } from '@/services/laborMarketService';
 import type { CandidateProfile } from '@/services/candidateMatchingService';
+import { CompanyProfileSetup, type CompanyProfile } from './CompanyProfileSetup';
+import { SectorDashboardTemplate } from './SectorDashboardTemplates';
 
 interface DashboardMetrics {
   availableCandidates: number;
@@ -52,9 +55,18 @@ export const BusinessDashboard = () => {
   const [alerts, setAlerts] = useState<CertificationAlert[]>([]);
   const [topCandidates, setTopCandidates] = useState<CandidateProfile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [companyProfile, setCompanyProfile] = useState<CompanyProfile | null>(null);
+  const [showProfileSetup, setShowProfileSetup] = useState(false);
 
   useEffect(() => {
-    fetchDashboardData();
+    // Check if company profile exists in localStorage
+    const savedProfile = localStorage.getItem('companyProfile');
+    if (savedProfile) {
+      setCompanyProfile(JSON.parse(savedProfile));
+      fetchDashboardData();
+    } else {
+      setShowProfileSetup(true);
+    }
   }, []);
 
   const fetchDashboardData = async () => {
@@ -167,6 +179,26 @@ export const BusinessDashboard = () => {
     }
   };
 
+  const handleProfileComplete = (profile: CompanyProfile) => {
+    setCompanyProfile(profile);
+    localStorage.setItem('companyProfile', JSON.stringify(profile));
+    setShowProfileSetup(false);
+    fetchDashboardData();
+  };
+
+  const handleReconfigureProfile = () => {
+    setShowProfileSetup(true);
+  };
+
+  // Show profile setup if no profile exists
+  if (showProfileSetup || !companyProfile) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12">
+        <CompanyProfileSetup onProfileComplete={handleProfileComplete} />
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -190,16 +222,22 @@ export const BusinessDashboard = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">
-              Dashboard Empresarial
+              Dashboard Empresarial - {companyProfile.companyName}
             </h1>
             <p className="text-lg text-muted-foreground">
-              Vista integral de métricas de mercado y talento certificado
+              Vista personalizada para {companyProfile.industry} • {companyProfile.companySize} empresa • {companyProfile.region}
             </p>
           </div>
-          <Button>
-            <Calendar className="h-4 w-4 mr-2" />
-            Programar Reunión
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleReconfigureProfile}>
+              <Settings className="h-4 w-4 mr-2" />
+              Reconfigurar
+            </Button>
+            <Button>
+              <Calendar className="h-4 w-4 mr-2" />
+              Programar Reunión
+            </Button>
+          </div>
         </div>
 
         {/* Quick Metrics */}
@@ -268,13 +306,18 @@ export const BusinessDashboard = () => {
         )}
 
         {/* Main Content Tabs */}
-        <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+        <Tabs defaultValue="sector-dashboard" className="w-full">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="sector-dashboard">Dashboard Personalizado</TabsTrigger>
             <TabsTrigger value="overview">Vista General</TabsTrigger>
             <TabsTrigger value="sectors">Comparativo Sectores</TabsTrigger>
             <TabsTrigger value="alerts">Alertas</TabsTrigger>
             <TabsTrigger value="candidates">Top Candidatos</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="sector-dashboard" className="mt-6">
+            <SectorDashboardTemplate profile={companyProfile} />
+          </TabsContent>
 
           <TabsContent value="overview" className="mt-6 space-y-6">
             {/* Market Overview */}
