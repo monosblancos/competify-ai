@@ -3,6 +3,7 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 
 import Header from './components/Header';
+import { Breadcrumbs } from './components/Breadcrumbs';
 import ProtectedRoute from './componets/ProtectedRoute';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
@@ -38,6 +39,11 @@ const App: React.FC = () => {
       <div className="bg-background min-h-screen font-sans">
         {showHeader && <Header />}
         <main className={showHeader ? "pt-28" : ""}>
+          {showHeader && (
+            <div className="container mx-auto px-4 pt-6">
+              <Breadcrumbs />
+            </div>
+          )}
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
@@ -60,7 +66,7 @@ const App: React.FC = () => {
             <Route path="/afiliados" element={<ProtectedRoute><AffiliatePage /></ProtectedRoute>} />
             <Route path="/comunidad" element={<ProtectedRoute><CommunityPage /></ProtectedRoute>} />
             <Route path="/networking" element={<ProtectedRoute><NetworkingPage /></ProtectedRoute>} />
-            <Route path="/empresa" element={<EmpresasPage />} />
+            <Route path="/empresas" element={<EmpresasPage />} />
             <Route path="/guided-flow" element={<ProtectedRoute><GuidedFlowPage /></ProtectedRoute>} />
 
             <Route path="*" element={<NotFoundPage />} />

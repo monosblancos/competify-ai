@@ -669,7 +669,7 @@ Finaliza tu respuesta con:
               </MegaMenu>
 
               <NavLink
-                to="/empresa"
+                to="/empresas"
                 className={({ isActive }) =>
                   `text-sm hover:text-foreground transition-colors ${
                     isActive ? 'text-primary font-medium' : 'text-muted-foreground'
