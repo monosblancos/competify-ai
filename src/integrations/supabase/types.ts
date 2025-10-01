@@ -157,6 +157,75 @@ export type Database = {
         }
         Relationships: []
       }
+      analytics_events: {
+        Row: {
+          created_at: string
+          event_category: string
+          event_data: Json | null
+          event_name: string
+          id: string
+          page_url: string | null
+          referrer: string | null
+          session_id: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_category: string
+          event_data?: Json | null
+          event_name: string
+          id?: string
+          page_url?: string | null
+          referrer?: string | null
+          session_id: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_category?: string
+          event_data?: Json | null
+          event_name?: string
+          id?: string
+          page_url?: string | null
+          referrer?: string | null
+          session_id?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      badge_benefits: {
+        Row: {
+          active: boolean | null
+          badge_id: string
+          created_at: string | null
+          description: string | null
+          discount_pct: number | null
+          premium_access_days: number | null
+          special_features: Json | null
+        }
+        Insert: {
+          active?: boolean | null
+          badge_id: string
+          created_at?: string | null
+          description?: string | null
+          discount_pct?: number | null
+          premium_access_days?: number | null
+          special_features?: Json | null
+        }
+        Update: {
+          active?: boolean | null
+          badge_id?: string
+          created_at?: string | null
+          description?: string | null
+          discount_pct?: number | null
+          premium_access_days?: number | null
+          special_features?: Json | null
+        }
+        Relationships: []
+      }
       business_chat_sessions: {
         Row: {
           company_info: Json | null
