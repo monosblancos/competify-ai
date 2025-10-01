@@ -1,7 +1,7 @@
 import React from 'react';
 import { Badge } from './Badge';
 import { Badge as BadgeType } from '../../types';
-import { Clock, Trophy } from 'lucide-react';
+import { Clock, Trophy, Gift } from 'lucide-react';
 
 interface AchievementCardProps {
   badges: BadgeType[];
@@ -18,6 +18,15 @@ export const AchievementCard: React.FC<AchievementCardProps> = ({
   const recentBadge = unlockedBadges.sort((a, b) => 
     new Date(b.unlockedAt!).getTime() - new Date(a.unlockedAt!).getTime()
   )[0];
+
+  // Count badges with benefits
+  const badgesWithBenefits = unlockedBadges.filter((b: any) => 
+    b.benefits && (
+      b.benefits.discount_pct > 0 || 
+      b.benefits.premium_access_days > 0 ||
+      (b.benefits.special_features && b.benefits.special_features.length > 0)
+    )
+  );
 
   return (
     <div className={`card-elegant p-6 ${className}`}>
@@ -44,6 +53,18 @@ export const AchievementCard: React.FC<AchievementCardProps> = ({
                 {new Date(recentBadge.unlockedAt!).toLocaleDateString('es-ES')}
               </p>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Benefits Summary */}
+      {badgesWithBenefits.length > 0 && (
+        <div className="bg-gradient-to-r from-warning/10 to-accent/10 rounded-lg p-3 mb-4 border border-warning/20">
+          <div className="flex items-center text-sm">
+            <Gift className="w-4 h-4 mr-2 text-warning" />
+            <span className="text-foreground font-medium">
+              {badgesWithBenefits.length} {badgesWithBenefits.length === 1 ? 'logro con beneficio activo' : 'logros con beneficios activos'}
+            </span>
           </div>
         </div>
       )}

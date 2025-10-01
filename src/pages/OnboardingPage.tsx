@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, User, FileText, Brain, Target } from 'lucide-react';
+import { useAnalytics } from '@/hooks/useAnalytics';
 
 interface OnboardingData {
   name: string;
@@ -30,6 +31,7 @@ const OnboardingPage = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const { setLastAnalysis } = useAuth();
   const navigate = useNavigate();
+  const { trackJourneyStep, trackConversion } = useAnalytics();
 
   const totalSteps = 4;
   const progress = (currentStep / totalSteps) * 100;
@@ -40,6 +42,7 @@ const OnboardingPage = () => {
 
   const handleNext = () => {
     if (currentStep < totalSteps) {
+      trackJourneyStep(`onboarding_step_${currentStep + 1}`);
       setCurrentStep(prev => prev + 1);
     }
   };
@@ -52,6 +55,7 @@ const OnboardingPage = () => {
 
   const handleAnalyze = async () => {
     setIsAnalyzing(true);
+    trackJourneyStep('cv_analysis_start');
     try {
       // Get standards for AI analysis
       const { data: standards } = await supabase
@@ -68,6 +72,7 @@ const OnboardingPage = () => {
 
       if (error) {
         console.error('Analysis error:', error);
+        trackJourneyStep('cv_analysis_failed', { error: error.message });
         return;
       }
 
@@ -75,15 +80,21 @@ const OnboardingPage = () => {
       const analysisResult = typeof result === 'string' ? JSON.parse(result) : result;
       setData(prev => ({ ...prev, analysisResult }));
       await setLastAnalysis(analysisResult);
+      trackJourneyStep('cv_analysis_complete', { 
+        recommended_standard: analysisResult.recommendedStandard?.code 
+      });
       handleNext();
     } catch (error) {
       console.error('Analysis failed:', error);
+      trackJourneyStep('cv_analysis_error');
     } finally {
       setIsAnalyzing(false);
     }
   };
 
   const handleComplete = () => {
+    trackJourneyStep('onboarding_complete');
+    trackConversion('onboarding_complete');
     navigate('/dashboard');
   };
 

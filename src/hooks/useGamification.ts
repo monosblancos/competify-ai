@@ -1,5 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { GamificationData, Badge, UserProgress } from '../types';
+import { supabase } from '@/integrations/supabase/client';
 
 // Mock badges system - in real app this would come from backend
 const mockBadges: Badge[] = [
@@ -70,6 +71,28 @@ const mockBadges: Badge[] = [
 ];
 
 export const useGamification = (progress: UserProgress): GamificationData => {
+  const [badgeBenefits, setBadgeBenefits] = useState<Record<string, any>>({});
+
+  // Fetch badge benefits from database
+  useEffect(() => {
+    const fetchBadgeBenefits = async () => {
+      const { data, error } = await supabase
+        .from('badge_benefits')
+        .select('*')
+        .eq('active', true);
+
+      if (!error && data) {
+        const benefitsMap = data.reduce((acc, benefit) => {
+          acc[benefit.badge_id] = benefit;
+          return acc;
+        }, {} as Record<string, any>);
+        setBadgeBenefits(benefitsMap);
+      }
+    };
+
+    fetchBadgeBenefits();
+  }, []);
+
   // Calculate total modules completed
   const totalModulesCompleted = useMemo(() => {
     return Object.values(progress).reduce(
@@ -148,7 +171,8 @@ export const useGamification = (progress: UserProgress): GamificationData => {
 
       return {
         ...badge,
-        unlockedAt: unlocked ? unlockedAt : undefined
+        unlockedAt: unlocked ? unlockedAt : undefined,
+        benefits: badgeBenefits[badge.id] // Attach benefits from database
       };
     });
   }, [totalModulesCompleted, currentStreak, progress]);

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useAnalytics } from '../hooks/useAnalytics';
 
 const RegisterPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -11,18 +12,24 @@ const RegisterPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
+  const { trackConversion, trackJourneyStep } = useAnalytics();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
+    trackConversion('register_attempt');
+    
     const { error } = await register(formData.email, formData.password, { name: formData.name });
     
     if (error) {
       console.error('Registration error:', error);
+      trackConversion('register_failed', { error: error.message });
       alert(`Error de registro: ${error.message}`);
       setIsLoading(false);
     } else {
+      trackConversion('register_success');
+      trackJourneyStep('registration_complete');
       alert('Registro exitoso. Por favor revisa tu correo para confirmar tu cuenta.');
       navigate('/login');
     }

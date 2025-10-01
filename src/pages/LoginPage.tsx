@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useAnalytics } from '../hooks/useAnalytics';
 
 const LoginPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -10,6 +11,7 @@ const LoginPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { login, user, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const { trackConversion, trackJourneyStep } = useAnalytics();
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -23,18 +25,23 @@ const LoginPage: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
     
+    trackConversion('login_attempt', { method: 'email' });
+    
     try {
       const { error } = await login(formData.email, formData.password);
       
       if (error) {
         console.error('Login error:', error);
+        trackConversion('login_failed', { error: error.message });
         alert(`Error de login: ${error.message}`);
       } else {
-        // Don't navigate immediately - let the auth state change handle it
+        trackConversion('login_success', { method: 'email' });
+        trackJourneyStep('login_complete');
         console.log('Login successful, waiting for auth state change...');
       }
     } catch (err) {
       console.error('Login error:', err);
+      trackConversion('login_error');
       alert('Error inesperado durante el login');
     } finally {
       setIsLoading(false);
@@ -142,16 +149,21 @@ const LoginPage: React.FC = () => {
               <button
                 onClick={async () => {
                   setIsLoading(true);
+                  trackConversion('login_attempt', { method: 'demo' });
                   try {
                     const { error } = await login('demo@certificaglobal.mx', '');
                     if (error) {
                       console.error('Demo login error:', error);
+                      trackConversion('login_failed', { method: 'demo', error: error.message });
                       alert(`Error de login: ${error.message}`);
                     } else {
+                      trackConversion('login_success', { method: 'demo' });
+                      trackJourneyStep('login_complete', { method: 'demo' });
                       console.log('Demo login successful, waiting for auth state change...');
                     }
                   } catch (err) {
                     console.error('Demo login error:', err);
+                    trackConversion('login_error', { method: 'demo' });
                     alert('Error inesperado durante el login demo');
                   } finally {
                     setIsLoading(false);
