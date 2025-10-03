@@ -28,6 +28,7 @@ import CommunityPage from './pages/CommunityPage';
 import NetworkingPage from './pages/NetworkingPage';
 import EmpresasPage from './pages/EmpresasPage';
 import GuidedFlowPage from './pages/GuidedFlowPage';
+import AnalyticsDashboardPage from './pages/AnalyticsDashboardPage';
 
 const App: React.FC = () => {
   const location = useLocation();
@@ -68,6 +69,7 @@ const App: React.FC = () => {
             <Route path="/networking" element={<ProtectedRoute><NetworkingPage /></ProtectedRoute>} />
             <Route path="/empresas" element={<EmpresasPage />} />
             <Route path="/guided-flow" element={<ProtectedRoute><GuidedFlowPage /></ProtectedRoute>} />
+            <Route path="/analytics" element={<ProtectedRoute><AnalyticsDashboardPage /></ProtectedRoute>} />
 
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
