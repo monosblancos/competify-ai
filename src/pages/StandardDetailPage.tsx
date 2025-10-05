@@ -50,7 +50,7 @@ const StandardDetailPage: React.FC = () => {
           .from('standards')
           .select('*')
           .eq('code', standardCode)
-          .single();
+          .maybeSingle();
 
         if (standardError) throw standardError;
         setStandard({

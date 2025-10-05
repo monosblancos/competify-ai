@@ -603,8 +603,8 @@ Finaliza tu respuesta con:
                       </div>
                       <div className="space-y-2">
                         {[
-                          { code: "EC0217", title: "Impartición de cursos", students: "2,847", hot: true },
-                          { code: "EC0366", title: "Desarrollo de software", students: "3,241", hot: true },
+                          { code: "EC0217.01", title: "Impartición de cursos", students: "2,847", hot: true },
+                          { code: "EC0366", title: "Formación en línea", students: "3,241", hot: true },
                           { code: "EC0301", title: "Diseño curricular", students: "1,923", hot: false },
                           { code: "EC0076", title: "Evaluación de competencias", students: "1,456", hot: false }
                         ].map((standard) => (
