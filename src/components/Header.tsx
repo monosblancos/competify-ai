@@ -556,118 +556,169 @@ Finaliza tu respuesta con:
                 onToggle={() => setActiveMenu(activeMenu === "estandares" ? null : "estandares")}
                 analytics="nav_estandares_click"
               >
-                <div className="p-6 w-[900px]">
-                  <div className="grid grid-cols-4 gap-6">
-                    {/* Columna 1: Búsqueda rápida */}
+                <div className="p-6 w-[800px]">
+                  <div className="grid grid-cols-3 gap-6">
+                    {/* Columna 1: DESCUBRE TU RUTA */}
                     <div>
                       <div className="mb-3 text-xs font-semibold uppercase text-primary">
-                        Búsqueda rápida
-                      </div>
-                      <div className="space-y-2">
-                        <div className="p-3 rounded-lg border border-border hover:bg-muted transition-colors">
-                          <div className="text-sm font-medium mb-1">Por código</div>
-                          <div className="text-xs text-muted-foreground">EC0217, EC0301, etc.</div>
-                        </div>
-                        <div className="p-3 rounded-lg border border-border hover:bg-muted transition-colors">
-                          <div className="text-sm font-medium mb-1">Por categoría</div>
-                          <div className="text-xs text-muted-foreground">Educación, TI, RRHH</div>
-                        </div>
-                        <Link
-                          to="/estandares"
-                          className="block w-full p-2 text-center text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-                        >
-                          Explorar todos
-                        </Link>
-                      </div>
-                    </div>
-
-                    {/* Columna 2: Categorías principales */}
-                    <div>
-                      <div className="mb-3 text-xs font-semibold uppercase text-primary">
-                        Categorías principales
+                        🎯 Descubre tu ruta
                       </div>
                       <div className="space-y-2">
                         {[
-                          { name: "Educación y Formación", count: "487", popular: true },
-                          { name: "Tecnologías de la Información", count: "324", popular: true },
-                          { name: "Recursos Humanos", count: "256", popular: false },
-                          { name: "Evaluación y Certificación", count: "189", popular: false },
-                          { name: "Consultoría", count: "143", popular: false }
+                          { name: "Educación y Formación", count: "487", icon: "📚", color: "bg-blue-50 border-blue-200 hover:bg-blue-100" },
+                          { name: "Tecnologías de la Información", count: "324", icon: "💻", color: "bg-purple-50 border-purple-200 hover:bg-purple-100" },
+                          { name: "Recursos Humanos", count: "256", icon: "👥", color: "bg-green-50 border-green-200 hover:bg-green-100" },
+                          { name: "Consultoría", count: "143", icon: "📊", color: "bg-orange-50 border-orange-200 hover:bg-orange-100" }
                         ].map((category) => (
                           <Link
                             key={category.name}
                             to={`/estandares?categoria=${encodeURIComponent(category.name)}`}
-                            className="block p-2 rounded-lg hover:bg-muted text-sm transition-colors"
-                          >
-                            <div className="flex items-center justify-between">
-                              <div className="font-medium">{category.name}</div>
-                              {category.popular && (
-                                <span className="bg-green-100 text-green-800 text-[10px] px-2 py-0.5 rounded-full">Popular</span>
-                              )}
-                            </div>
-                            <div className="text-xs text-muted-foreground">{category.count} estándares</div>
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Columna 3: Estándares más demandados */}
-                    <div>
-                      <div className="mb-3 text-xs font-semibold uppercase text-primary flex items-center gap-2">
-                        <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-                        Más demandados
-                      </div>
-                      <div className="space-y-2">
-                        {[
-                          { code: "EC0217", title: "Impartición de cursos", demand: "🔥 Alta", students: "2,847" },
-                          { code: "EC0366", title: "Desarrollo de software", demand: "🔥 Alta", students: "3,241" },
-                          { code: "EC0301", title: "Diseño curricular", demand: "📈 Creciente", students: "1,923" },
-                          { code: "EC0076", title: "Evaluación de competencias", demand: "📊 Estable", students: "1,456" }
-                        ].map((standard) => (
-                          <Link
-                            key={standard.code}
-                            to={`/estandares/${standard.code}`}
-                            className="block p-2 rounded-lg border border-border hover:bg-muted transition-colors"
+                            className={`block p-3 rounded-lg border transition-all ${category.color}`}
+                            data-analytics={`nav_category_${category.name.toLowerCase().replace(/\s+/g, '_')}`}
                           >
                             <div className="flex items-center gap-2 mb-1">
-                              <span className="text-xs font-bold bg-primary text-primary-foreground px-2 py-0.5 rounded">{standard.code}</span>
-                              <span className="text-[10px] text-muted-foreground">{standard.demand}</span>
+                              <span className="text-lg">{category.icon}</span>
+                              <div className="text-sm font-medium">{category.name}</div>
                             </div>
-                            <div className="text-xs font-medium text-foreground mb-1">{standard.title}</div>
-                            <div className="text-[10px] text-muted-foreground">{standard.students} estudiantes activos</div>
+                            <div className="text-xs text-muted-foreground ml-7">{category.count} estándares</div>
                           </Link>
                         ))}
-                      </div>
-                    </div>
-
-                    {/* Columna 4: Herramientas y recursos */}
-                    <div>
-                      <div className="mb-3 text-xs font-semibold uppercase text-primary">
-                        Herramientas
-                      </div>
-                      <div className="space-y-2">
-                        <button
-                          onClick={copyPrompt}
-                          className="w-full p-3 rounded-lg border border-border hover:bg-muted text-left transition-colors"
-                        >
-                          <div className="text-sm font-medium mb-1 flex items-center gap-2">
-                            Prompt para Claude
-                            {copiedPrompt && <span className="text-green-500 text-xs">✓ Copiado</span>}
-                          </div>
-                          <div className="text-xs text-muted-foreground">Análisis con IA especializada</div>
-                        </button>
                         
                         <Link
                           to="/diagnostico"
-                          className="block p-3 rounded-lg border border-border hover:bg-muted transition-colors"
+                          className="block p-3 rounded-lg border-2 border-primary bg-primary/5 hover:bg-primary/10 transition-all"
+                          data-analytics="nav_test_certificacion"
                         >
-                          <div className="text-sm font-medium mb-1">Diagnóstico CV</div>
-                          <div className="text-xs text-muted-foreground">Encuentra tu ruta de certificación</div>
+                          <div className="text-sm font-bold text-primary mb-1">✨ Test: ¿Qué certificar?</div>
+                          <div className="text-xs text-muted-foreground">Descubre en 3 min</div>
+                        </Link>
+                      </div>
+                    </div>
+
+                    {/* Columna 2: MÁS DEMANDADOS */}
+                    <div>
+                      <div className="mb-3 text-xs font-semibold uppercase text-primary flex items-center gap-2">
+                        <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                        🔥 Top demanda 2025
+                      </div>
+                      <div className="space-y-2">
+                        {[
+                          { code: "EC0217", title: "Impartición de cursos", students: "2,847", hot: true },
+                          { code: "EC0366", title: "Desarrollo de software", students: "3,241", hot: true },
+                          { code: "EC0301", title: "Diseño curricular", students: "1,923", hot: false },
+                          { code: "EC0076", title: "Evaluación de competencias", students: "1,456", hot: false }
+                        ].map((standard) => (
+                          <div key={standard.code} className="relative">
+                            {standard.hot && (
+                              <div className="absolute -top-1 -right-1 z-10">
+                                <div className="bg-red-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+                                  HOT
+                                </div>
+                              </div>
+                            )}
+                            <Link
+                              to={`/estandares/${standard.code}`}
+                              className="block p-3 rounded-lg border border-border hover:bg-muted hover:border-primary/50 transition-all group"
+                              data-analytics={`nav_standard_${standard.code}`}
+                            >
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="text-xs font-bold bg-primary text-primary-foreground px-2 py-1 rounded">
+                                  {standard.code}
+                                </span>
+                              </div>
+                              <div className="text-xs font-medium text-foreground mb-2">{standard.title}</div>
+                              <div className="flex items-center justify-between text-[10px]">
+                                <span className="text-muted-foreground flex items-center gap-1">
+                                  <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                                  {standard.students} activos
+                                </span>
+                                <span className="text-primary font-medium group-hover:underline">
+                                  Ver más →
+                                </span>
+                              </div>
+                            </Link>
+                          </div>
+                        ))}
+                        
+                        <Link
+                          to="/estandares"
+                          className="block w-full p-2 text-center text-xs bg-muted hover:bg-muted/80 rounded-lg transition-colors mt-3"
+                          data-analytics="nav_ver_todos_estandares"
+                        >
+                          Ver todos los estándares →
+                        </Link>
+                      </div>
+                    </div>
+
+                    {/* Columna 3: ACELERA TU ÉXITO */}
+                    <div>
+                      <div className="mb-3 text-xs font-semibold uppercase text-primary">
+                        🚀 Acelera tu éxito
+                      </div>
+                      <div className="space-y-3">
+                        {/* Kit Gratuito */}
+                        <div className="rounded-xl border-2 border-purple-200 overflow-hidden bg-gradient-to-br from-purple-50 to-blue-50">
+                          <div className="p-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-lg">🎁</span>
+                              <div className="text-xs font-bold">Kit Certificación</div>
+                            </div>
+                            <div className="text-[10px] opacity-90 mb-2">
+                              Guía + Plantillas + Test
+                            </div>
+                            <Link 
+                              to="/recursos?tipo=toolkit" 
+                              className="block w-full text-center px-3 py-1.5 rounded-md bg-white text-purple-700 text-xs font-bold hover:bg-gray-50 transition-colors"
+                              data-analytics="nav_kit_certificacion"
+                            >
+                              Descargar GRATIS
+                            </Link>
+                          </div>
+                          <div className="p-2 text-center">
+                            <div className="text-[9px] text-orange-600 font-semibold">
+                              ⚡ Solo 347 kits restantes
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Diagnóstico CV */}
+                        <Link
+                          to="/diagnostico"
+                          className="block p-3 rounded-lg border border-border hover:bg-muted hover:border-primary/50 transition-all group"
+                          data-analytics="nav_diagnostico_cv"
+                        >
+                          <div className="text-sm font-medium mb-1 flex items-center gap-2">
+                            🎯 Diagnóstico CV
+                            <span className="text-[9px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold">
+                              GRATIS
+                            </span>
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            IA encuentra tu mejor certificación
+                          </div>
                         </Link>
 
-                        <div className="p-3 rounded-lg bg-muted/50">
-                          <div className="text-sm font-medium mb-1">📊 Base de datos</div>
-                          <div className="text-xs text-muted-foreground">1,845 estándares CONOCER actualizados</div>
+                        {/* Prompt Claude */}
+                        <button
+                          onClick={copyPrompt}
+                          className="w-full p-3 rounded-lg border border-border hover:bg-muted hover:border-primary/50 text-left transition-all group"
+                          data-analytics="nav_prompt_claude"
+                        >
+                          <div className="text-sm font-medium mb-1 flex items-center gap-2">
+                            🤖 Prompt Claude
+                            {copiedPrompt && <span className="text-green-500 text-xs">✓</span>}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            Analiza con metodología CG™
+                          </div>
+                        </button>
+
+                        {/* Base de datos */}
+                        <div className="p-3 rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200">
+                          <div className="text-xs font-bold text-blue-900 mb-1">📊 Base CONOCER</div>
+                          <div className="text-[10px] text-blue-700">
+                            1,845 estándares actualizados 2025
+                          </div>
                         </div>
                       </div>
                     </div>
