@@ -4,12 +4,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
-import { Upload, FileSpreadsheet, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
+import { Upload, FileSpreadsheet, AlertCircle, CheckCircle, Loader2, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import * as XLSX from 'xlsx';
+import { ragChatbot } from '@/services/ragChatbotService';
 
 export default function AdminImportPage() {
   const [importing, setImporting] = useState(false);
+  const [generatingEmbeddings, setGeneratingEmbeddings] = useState(false);
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState<any>(null);
   const { toast } = useToast();
@@ -84,6 +86,32 @@ export default function AdminImportPage() {
     }
   };
 
+  const handleGenerateEmbeddings = async () => {
+    try {
+      setGeneratingEmbeddings(true);
+      toast({
+        title: "Generando embeddings",
+        description: "Este proceso puede tardar varios minutos...",
+      });
+
+      await ragChatbot.generateEmbeddings();
+      
+      toast({
+        title: "¡Embeddings generados!",
+        description: "Los estándares ahora pueden ser buscados semánticamente",
+      });
+    } catch (error) {
+      console.error('Error generando embeddings:', error);
+      toast({
+        title: "Error generando embeddings",
+        description: error instanceof Error ? error.message : 'Error desconocido',
+        variant: "destructive"
+      });
+    } finally {
+      setGeneratingEmbeddings(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 p-8">
       <div className="max-w-4xl mx-auto space-y-8">
@@ -155,7 +183,7 @@ export default function AdminImportPage() {
                 )}
                 <AlertDescription className="ml-2">
                   {result.success ? (
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       <p className="font-medium">✅ Importación completada</p>
                       <ul className="text-sm space-y-1 ml-4">
                         <li>• Importados: {result.imported}</li>
@@ -163,9 +191,29 @@ export default function AdminImportPage() {
                         <li>• Total: {result.total}</li>
                       </ul>
                       {result.imported > 0 && (
-                        <p className="text-xs text-muted-foreground mt-2">
-                          🔮 Generando embeddings vectoriales en background...
-                        </p>
+                        <div className="space-y-2">
+                          <p className="text-xs text-muted-foreground">
+                            🔮 Los embeddings se están generando automáticamente en background
+                          </p>
+                          <Button
+                            onClick={handleGenerateEmbeddings}
+                            disabled={generatingEmbeddings}
+                            size="sm"
+                            className="w-full"
+                          >
+                            {generatingEmbeddings ? (
+                              <>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                Generando embeddings...
+                              </>
+                            ) : (
+                              <>
+                                <Sparkles className="w-4 h-4 mr-2" />
+                                Regenerar embeddings manualmente
+                              </>
+                            )}
+                          </Button>
+                        </div>
                       )}
                     </div>
                   ) : (
